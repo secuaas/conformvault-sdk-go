@@ -21,7 +21,7 @@ const (
 	// DefaultBaseURL is the default API base URL.
 	DefaultBaseURL = "https://api.conformvault.com/dev/v1"
 	// Version is the SDK version.
-	Version = "0.1.0"
+	Version = "0.3.0"
 	// userAgent is the User-Agent header value.
 	userAgent = "conformvault-go/" + Version
 )
@@ -32,13 +32,19 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 
-	Files      *FilesService
-	Folders    *FoldersService
-	ShareLinks *ShareLinksService
-	Signatures *SignaturesService
-	Webhooks   *WebhooksService
-	Audit      *AuditService
-	Keys       *KeysService
+	Files       *FilesService
+	Folders     *FoldersService
+	ShareLinks  *ShareLinksService
+	Signatures  *SignaturesService
+	Webhooks    *WebhooksService
+	Audit       *AuditService
+	Keys        *KeysService
+	Bulk        *BulkService
+	Versions    *VersionsService
+	Search      *SearchService
+	Trash       *TrashService
+	ScanReports *ScanReportsService
+	Attestation *AttestationService
 }
 
 // Option configures the client.
@@ -79,6 +85,12 @@ func NewClient(apiKey string, opts ...Option) *Client {
 	c.Webhooks = &WebhooksService{client: c}
 	c.Audit = &AuditService{client: c}
 	c.Keys = &KeysService{client: c}
+	c.Bulk = &BulkService{client: c}
+	c.Versions = &VersionsService{client: c}
+	c.Search = &SearchService{client: c}
+	c.Trash = &TrashService{client: c}
+	c.ScanReports = &ScanReportsService{client: c}
+	c.Attestation = &AttestationService{client: c}
 
 	return c
 }

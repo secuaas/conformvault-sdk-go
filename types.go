@@ -203,3 +203,45 @@ type DataResponse[T any] struct {
 type MessageResponse struct {
 	Message string `json:"message"`
 }
+
+// --- Scan Reports ---
+
+// FileScanReport represents the antivirus scan result for a file.
+type FileScanReport struct {
+	ID             string  `json:"id"`
+	FileID         string  `json:"file_id"`
+	OrganizationID string  `json:"organization_id"`
+	ScanEngine     string  `json:"scan_engine"`
+	EngineVersion  *string `json:"engine_version,omitempty"`
+	ScanStatus     string  `json:"scan_status"`
+	ThreatName     *string `json:"threat_name,omitempty"`
+	FileSize       *int64  `json:"file_size,omitempty"`
+	MimeType       *string `json:"mime_type,omitempty"`
+	ScanDurationMs *int    `json:"scan_duration_ms,omitempty"`
+	ScannedAt      string  `json:"scanned_at"`
+}
+
+// ScanReportListOptions are query parameters for listing scan reports.
+type ScanReportListOptions struct {
+	Limit  int
+	Offset int
+}
+
+// ScanReportListResponse is the paginated response for listing scan reports.
+type ScanReportListResponse struct {
+	Reports []FileScanReport `json:"reports"`
+	Total   int              `json:"total"`
+	Limit   int              `json:"limit"`
+	Offset  int              `json:"offset"`
+}
+
+// FileScanSummary contains aggregate scan statistics for an organization.
+type FileScanSummary struct {
+	TotalScans    int    `json:"total_scans"`
+	CleanCount    int    `json:"clean_count"`
+	InfectedCount int    `json:"infected_count"`
+	ErrorCount    int    `json:"error_count"`
+	SkippedCount  int    `json:"skipped_count"`
+	ScanEngine    string `json:"scan_engine"`
+	EngineVersion string `json:"engine_version"`
+}
