@@ -39,11 +39,18 @@
 
 ---
 
-### 0.2.0 - 2026-02-27
+### 0.2.0 - 2026-02-27 (backfill committed 2026-03-02)
+**Commit:** `df74b64`
 **Type:** Minor - V2-4 SDK expansion: bulk, versions, search, trash services
 
 ### Ajouté
-- `BulkService`, `VersionsService`, `SearchService`, `TrashService`
+- **`bulk.go`**: `BulkService` — Delete, Move, Download (ZIP stream)
+- **`versions.go`**: `VersionsService` — List, Get, Restore, Delete
+- **`search.go`**: `SearchService` — Search (with query params: q, types, folder_id, page, page_size)
+- **`trash.go`**: `TrashService` — List, Restore, Delete, Empty, GetStats
+
+### Tests effectués
+- ✅ `go build ./...` — success
 
 ---
 
