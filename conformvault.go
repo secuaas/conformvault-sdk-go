@@ -43,8 +43,11 @@ type Client struct {
 	Versions    *VersionsService
 	Search      *SearchService
 	Trash       *TrashService
-	ScanReports *ScanReportsService
-	Attestation *AttestationService
+	ScanReports   *ScanReportsService
+	Attestation   *AttestationService
+	Transactions  *TransactionsService
+	Templates     *TemplatesService
+	Batches       *BatchesService
 }
 
 // Option configures the client.
@@ -91,6 +94,9 @@ func NewClient(apiKey string, opts ...Option) *Client {
 	c.Trash = &TrashService{client: c}
 	c.ScanReports = &ScanReportsService{client: c}
 	c.Attestation = &AttestationService{client: c}
+	c.Transactions = &TransactionsService{client: c}
+	c.Templates = &TemplatesService{client: c}
+	c.Batches = &BatchesService{client: c}
 
 	return c
 }
