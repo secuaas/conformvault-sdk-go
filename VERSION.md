@@ -1,11 +1,24 @@
 # Historique des Versions - ConformVault Go SDK
 
 ## Version Actuelle
-**0.4.0** - 2026-03-02
+**0.4.1** - 2026-03-03
 
 ---
 
 ## Versions
+
+### 0.4.1 - 2026-03-03
+**Commit:** `50e07df`
+**Type:** Patch - Add LICENSE (MIT) and CHANGELOG.md
+
+### Ajouté
+- `LICENSE` — MIT license file (was missing, referenced by README badge)
+- `CHANGELOG.md` — Keep a Changelog format, extracted from VERSION.md history
+
+### Tests effectués
+- ✅ `go build ./...` — success
+
+---
 
 ### 0.4.0 - 2026-03-02
 **Commit:** `d821e0a`
