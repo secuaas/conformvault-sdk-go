@@ -47,6 +47,29 @@ func (s *SignaturesService) DownloadSigned(ctx context.Context, envelopeID strin
 	return s.client.doRaw(req)
 }
 
+// List returns all signature envelopes for the organization.
+func (s *SignaturesService) List(ctx context.Context) ([]SignatureEnvelope, error) {
+	req, err := s.client.newRequest(ctx, "GET", "/signatures", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp DataResponse[[]SignatureEnvelope]
+	if err := s.client.do(req, &resp); err != nil {
+		return nil, err
+	}
+	return resp.Data, nil
+}
+
+// DownloadAuditTrail downloads the audit trail (completion certificate) PDF.
+func (s *SignaturesService) DownloadAuditTrail(ctx context.Context, envelopeID string) (io.ReadCloser, error) {
+	req, err := s.client.newRequest(ctx, "GET", "/signatures/"+envelopeID+"/audit-trail", nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.doRaw(req)
+}
+
 // Revoke cancels a pending signature envelope.
 func (s *SignaturesService) Revoke(ctx context.Context, envelopeID string) error {
 	req, err := s.client.newRequest(ctx, "POST", "/signatures/"+envelopeID+"/revoke", nil)
