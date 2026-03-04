@@ -21,7 +21,7 @@ const (
 	// DefaultBaseURL is the default API base URL.
 	DefaultBaseURL = "https://api.conformvault.com/dev/v1"
 	// Version is the SDK version.
-	Version = "0.4.0"
+	Version = "0.5.0"
 	// userAgent is the User-Agent header value.
 	userAgent = "conformvault-go/" + Version
 )
@@ -32,22 +32,33 @@ type Client struct {
 	baseURL    string
 	httpClient *http.Client
 
-	Files       *FilesService
-	Folders     *FoldersService
-	ShareLinks  *ShareLinksService
-	Signatures  *SignaturesService
-	Webhooks    *WebhooksService
-	Audit       *AuditService
-	Keys        *KeysService
-	Bulk        *BulkService
-	Versions    *VersionsService
-	Search      *SearchService
-	Trash       *TrashService
-	ScanReports   *ScanReportsService
-	Attestation   *AttestationService
-	Transactions  *TransactionsService
-	Templates     *TemplatesService
-	Batches       *BatchesService
+	Files                 *FilesService
+	Folders               *FoldersService
+	ShareLinks            *ShareLinksService
+	Signatures            *SignaturesService
+	Webhooks              *WebhooksService
+	Audit                 *AuditService
+	Keys                  *KeysService
+	Bulk                  *BulkService
+	Versions              *VersionsService
+	Search                *SearchService
+	Trash                 *TrashService
+	ScanReports           *ScanReportsService
+	Attestation           *AttestationService
+	Transactions          *TransactionsService
+	Templates             *TemplatesService
+	Batches               *BatchesService
+	Metadata              *MetadataService
+	Retention             *RetentionService
+	LegalHolds            *LegalHoldsService
+	Permissions           *PermissionsService
+	Comments              *CommentsService
+	Quota                 *QuotaService
+	RateLimit             *RateLimitService
+	UploadSessions        *UploadSessionsService
+	Jobs                  *JobsService
+	ActivitySubscriptions *ActivitySubscriptionsService
+	Policies              *PoliciesService
 }
 
 // Option configures the client.
@@ -97,6 +108,17 @@ func NewClient(apiKey string, opts ...Option) *Client {
 	c.Transactions = &TransactionsService{client: c}
 	c.Templates = &TemplatesService{client: c}
 	c.Batches = &BatchesService{client: c}
+	c.Metadata = &MetadataService{client: c}
+	c.Retention = &RetentionService{client: c}
+	c.LegalHolds = &LegalHoldsService{client: c}
+	c.Permissions = &PermissionsService{client: c}
+	c.Comments = &CommentsService{client: c}
+	c.Quota = &QuotaService{client: c}
+	c.RateLimit = &RateLimitService{client: c}
+	c.UploadSessions = &UploadSessionsService{client: c}
+	c.Jobs = &JobsService{client: c}
+	c.ActivitySubscriptions = &ActivitySubscriptionsService{client: c}
+	c.Policies = &PoliciesService{client: c}
 
 	return c
 }

@@ -114,3 +114,25 @@ func (s *FilesService) Delete(ctx context.Context, fileID string) error {
 	}
 	return s.client.do(req, nil)
 }
+
+// GetThumbnail returns the thumbnail image for a file as a raw stream.
+func (s *FilesService) GetThumbnail(ctx context.Context, fileID string) (io.ReadCloser, error) {
+	req, err := s.client.newRequest(ctx, "GET", "/files/"+fileID+"/thumbnail", nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.doRaw(req)
+}
+
+// GetScanReport returns the antivirus scan report for a file.
+func (s *FilesService) GetScanReport(ctx context.Context, fileID string) (*FileScanReport, error) {
+	req, err := s.client.newRequest(ctx, "GET", "/files/"+fileID+"/scan-report", nil)
+	if err != nil {
+		return nil, err
+	}
+	var resp DataResponse[FileScanReport]
+	if err := s.client.do(req, &resp); err != nil {
+		return nil, err
+	}
+	return &resp.Data, nil
+}

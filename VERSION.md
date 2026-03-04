@@ -1,11 +1,39 @@
 # Historique des Versions - ConformVault Go SDK
 
 ## Version Actuelle
-**0.4.1** - 2026-03-03
+**0.5.0** - 2026-03-04
 
 ---
 
 ## Versions
+
+### 0.5.0 - 2026-03-04
+**Commit:** `pending`
+**Type:** Minor - SDK v0.5.0: 57 new methods across 11 new services (~85% API coverage)
+
+### Ajouté
+- **Webhooks**: `ListDeliveries`, `GetDelivery`, `ReplayDelivery`, `ReEnable` (4 methods)
+- **Audit**: `Search`, `Export` (raw stream), `GetStats`, `GetAnomalies` (4 methods)
+- **Files**: `GetThumbnail` (raw stream), `GetScanReport` (2 methods)
+- **`metadata.go`**: `MetadataService` — AddTags, RemoveTag, GetTags, ListByTag, SetMetadata, GetMetadata, DeleteMetadataKey (7 methods)
+- **`retention.go`**: `RetentionService` — Create, List, Get, Update, Delete (5 methods)
+- **`legal_holds.go`**: `LegalHoldsService` — Create, List, Get, Release, AddFiles, RemoveFile (6 methods)
+- **`permissions.go`**: `PermissionsService` — Set, Get, Revoke (3 methods)
+- **`comments.go`**: `CommentsService` — Create, List, Get, Update, Delete, GetReplies (6 methods)
+- **`quota.go`**: `QuotaService` — Get (1 method) + `RateLimitService` — Get (1 method)
+- **`upload_sessions.go`**: `UploadSessionsService` — Create, UploadChunk, GetStatus, Complete, Cancel (5 methods)
+- **`jobs.go`**: `JobsService` — Create, List, Get, Cancel (4 methods)
+- **`activity_subscriptions.go`**: `ActivitySubscriptionsService` — Subscribe, List, Unsubscribe (3 methods)
+- **`policies.go`**: `PoliciesService` — GetIPPolicy, SetIPPolicy, GetMFAPolicy, SetMFAPolicy, GetEncryptionSalt, SetEncryptionSalt (6 methods)
+- 30+ new types in `types.go`
+- Version bumped to 0.5.0
+- Total services: 16 → 27
+
+### Tests effectués
+- ✅ `go build ./...` — success
+- ✅ `go vet ./...` — success
+
+---
 
 ### 0.4.1 - 2026-03-03
 **Commit:** `50e07df`

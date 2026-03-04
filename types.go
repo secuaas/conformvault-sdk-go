@@ -245,3 +245,294 @@ type FileScanSummary struct {
 	ScanEngine    string `json:"scan_engine"`
 	EngineVersion string `json:"engine_version"`
 }
+
+// --- Webhook Delivery types ---
+
+// WebhookDelivery represents a webhook delivery attempt.
+type WebhookDelivery struct {
+	ID           string     `json:"id"`
+	WebhookID    string     `json:"webhook_id"`
+	EventType    string     `json:"event_type"`
+	Status       string     `json:"status"`
+	HTTPStatus   int        `json:"http_status"`
+	RequestBody  string     `json:"request_body,omitempty"`
+	ResponseBody string     `json:"response_body,omitempty"`
+	CreatedAt    time.Time  `json:"created_at"`
+	DeliveredAt  *time.Time `json:"delivered_at,omitempty"`
+}
+
+// --- Audit extended types ---
+
+// AuditSearchOptions are query parameters for searching audit entries.
+type AuditSearchOptions struct {
+	Query     string `json:"query,omitempty"`
+	EventType string `json:"event_type,omitempty"`
+	From      string `json:"from,omitempty"`
+	To        string `json:"to,omitempty"`
+	Page      int    `json:"page,omitempty"`
+	Limit     int    `json:"limit,omitempty"`
+}
+
+// AuditExportOptions are query parameters for exporting audit logs.
+type AuditExportOptions struct {
+	Format    string `json:"format,omitempty"` // json, csv
+	EventType string `json:"event_type,omitempty"`
+	From      string `json:"from,omitempty"`
+	To        string `json:"to,omitempty"`
+}
+
+// AuditStats contains aggregated audit statistics.
+type AuditStats struct {
+	TotalEvents  int            `json:"total_events"`
+	EventsByType map[string]int `json:"events_by_type"`
+	EventsByDay  map[string]int `json:"events_by_day"`
+}
+
+// AuditAnomaly represents a detected audit anomaly.
+type AuditAnomaly struct {
+	ID          string    `json:"id"`
+	Type        string    `json:"type"`
+	Description string    `json:"description"`
+	Severity    string    `json:"severity"`
+	DetectedAt  time.Time `json:"detected_at"`
+}
+
+// --- File Metadata & Tags types ---
+
+// FileTag represents a tag attached to a file.
+type FileTag struct {
+	Tag       string    `json:"tag"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// AddTagsRequest is the input for adding tags to a file.
+type AddTagsRequest struct {
+	Tags []string `json:"tags"`
+}
+
+// FileMetadataEntry represents a single metadata key-value pair.
+type FileMetadataEntry struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+// SetMetadataRequest is the input for setting metadata on a file.
+type SetMetadataRequest struct {
+	Metadata map[string]string `json:"metadata"`
+}
+
+// --- Retention Policy types ---
+
+// RetentionPolicy represents a data retention policy.
+type RetentionPolicy struct {
+	ID            string    `json:"id"`
+	Name          string    `json:"name"`
+	RetentionDays int       `json:"retention_days"`
+	AutoDelete    bool      `json:"auto_delete"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+// CreateRetentionPolicyRequest is the input for creating a retention policy.
+type CreateRetentionPolicyRequest struct {
+	Name          string `json:"name"`
+	RetentionDays int    `json:"retention_days"`
+	AutoDelete    bool   `json:"auto_delete"`
+}
+
+// UpdateRetentionPolicyRequest is the input for updating a retention policy.
+type UpdateRetentionPolicyRequest struct {
+	Name          *string `json:"name,omitempty"`
+	RetentionDays *int    `json:"retention_days,omitempty"`
+	AutoDelete    *bool   `json:"auto_delete,omitempty"`
+}
+
+// --- Legal Hold types ---
+
+// LegalHold represents a legal hold on files.
+type LegalHold struct {
+	ID          string     `json:"id"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Status      string     `json:"status"`
+	FileCount   int        `json:"file_count"`
+	CreatedAt   time.Time  `json:"created_at"`
+	ReleasedAt  *time.Time `json:"released_at,omitempty"`
+}
+
+// CreateLegalHoldRequest is the input for creating a legal hold.
+type CreateLegalHoldRequest struct {
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+}
+
+// AddLegalHoldFilesRequest is the input for adding files to a legal hold.
+type AddLegalHoldFilesRequest struct {
+	FileIDs []string `json:"file_ids"`
+}
+
+// LegalHoldFile represents a file under legal hold.
+type LegalHoldFile struct {
+	FileID  string    `json:"file_id"`
+	AddedAt time.Time `json:"added_at"`
+}
+
+// --- Folder Permission types ---
+
+// FolderPermission represents a permission granted on a folder.
+type FolderPermission struct {
+	FolderID   string    `json:"folder_id"`
+	UserID     string    `json:"user_id"`
+	Permission string    `json:"permission"`
+	GrantedAt  time.Time `json:"granted_at"`
+}
+
+// SetFolderPermissionRequest is the input for setting a folder permission.
+type SetFolderPermissionRequest struct {
+	UserID     string `json:"user_id"`
+	Permission string `json:"permission"`
+}
+
+// --- Comment types ---
+
+// Comment represents a comment on a file.
+type Comment struct {
+	ID        string    `json:"id"`
+	FileID    string    `json:"file_id"`
+	Content   string    `json:"content"`
+	AuthorID  string    `json:"author_id"`
+	ParentID  *string   `json:"parent_id,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
+// CreateCommentRequest is the input for creating a comment.
+type CreateCommentRequest struct {
+	Content  string  `json:"content"`
+	ParentID *string `json:"parent_id,omitempty"`
+}
+
+// UpdateCommentRequest is the input for updating a comment.
+type UpdateCommentRequest struct {
+	Content string `json:"content"`
+}
+
+// --- Quota types ---
+
+// QuotaInfo contains storage quota information.
+type QuotaInfo struct {
+	UsedBytes    int64 `json:"used_bytes"`
+	TotalBytes   int64 `json:"total_bytes"`
+	FileCount    int   `json:"file_count"`
+	MaxFileCount int   `json:"max_file_count"`
+}
+
+// --- Rate Limit types ---
+
+// RateLimitInfo contains rate limit status information.
+type RateLimitInfo struct {
+	RequestsPerMinute int    `json:"requests_per_minute"`
+	RequestsRemaining int    `json:"requests_remaining"`
+	ResetAt           string `json:"reset_at"`
+}
+
+// --- Upload Session types ---
+
+// UploadSession represents a chunked upload session.
+type UploadSession struct {
+	ID             string    `json:"id"`
+	Filename       string    `json:"filename"`
+	TotalSize      int64     `json:"total_size"`
+	ChunkSize      int64     `json:"chunk_size"`
+	ChunksUploaded int       `json:"chunks_uploaded"`
+	TotalChunks    int       `json:"total_chunks"`
+	Status         string    `json:"status"`
+	CreatedAt      time.Time `json:"created_at"`
+	ExpiresAt      time.Time `json:"expires_at"`
+}
+
+// CreateUploadSessionRequest is the input for creating a chunked upload session.
+type CreateUploadSessionRequest struct {
+	Filename    string  `json:"filename"`
+	TotalSize   int64   `json:"total_size"`
+	ContentType string  `json:"content_type,omitempty"`
+	FolderID    *string `json:"folder_id,omitempty"`
+}
+
+// --- Job types ---
+
+// Job represents a background job.
+type Job struct {
+	ID          string     `json:"id"`
+	Type        string     `json:"type"`
+	Status      string     `json:"status"`
+	Progress    int        `json:"progress"`
+	Result      any        `json:"result,omitempty"`
+	Error       string     `json:"error,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
+	CompletedAt *time.Time `json:"completed_at,omitempty"`
+}
+
+// CreateJobRequest is the input for creating a background job.
+type CreateJobRequest struct {
+	Type   string         `json:"type"`
+	Params map[string]any `json:"params,omitempty"`
+}
+
+// --- Activity Subscription types ---
+
+// ActivitySubscription represents an activity event subscription.
+type ActivitySubscription struct {
+	ID          string    `json:"id"`
+	EventTypes  []string  `json:"event_types"`
+	CallbackURL string    `json:"callback_url"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+// CreateActivitySubscriptionRequest is the input for creating an activity subscription.
+type CreateActivitySubscriptionRequest struct {
+	EventTypes  []string `json:"event_types"`
+	CallbackURL string   `json:"callback_url"`
+}
+
+// --- IP Policy types ---
+
+// IPPolicy represents an IP restriction policy.
+type IPPolicy struct {
+	Enabled    bool     `json:"enabled"`
+	AllowedIPs []string `json:"allowed_ips"`
+	DeniedIPs  []string `json:"denied_ips"`
+}
+
+// SetIPPolicyRequest is the input for updating the IP restriction policy.
+type SetIPPolicyRequest struct {
+	Enabled    bool     `json:"enabled"`
+	AllowedIPs []string `json:"allowed_ips,omitempty"`
+	DeniedIPs  []string `json:"denied_ips,omitempty"`
+}
+
+// --- MFA Policy types ---
+
+// MFAPolicy represents a multi-factor authentication policy.
+type MFAPolicy struct {
+	Enabled     bool     `json:"enabled"`
+	RequiredFor []string `json:"required_for"`
+}
+
+// SetMFAPolicyRequest is the input for updating the MFA policy.
+type SetMFAPolicyRequest struct {
+	Enabled     bool     `json:"enabled"`
+	RequiredFor []string `json:"required_for,omitempty"`
+}
+
+// --- Encryption Salt types ---
+
+// EncryptionSalt represents the encryption salt configuration.
+type EncryptionSalt struct {
+	Salt string `json:"salt"`
+}
+
+// SetEncryptionSaltRequest is the input for updating the encryption salt.
+type SetEncryptionSaltRequest struct {
+	Salt string `json:"salt"`
+}
