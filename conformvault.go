@@ -174,9 +174,11 @@ func (c *Client) do(req *http.Request, v any) error {
 	if resp.StatusCode >= 400 {
 		var apiErr APIError
 		apiErr.StatusCode = resp.StatusCode
-		if err := json.NewDecoder(resp.Body).Decode(&apiErr); err != nil {
-			body, _ := io.ReadAll(resp.Body)
-			apiErr.Message = string(body)
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 1<<20)) // 1MB max
+		if len(body) > 0 {
+			if err := json.Unmarshal(body, &apiErr); err != nil {
+				apiErr.Message = string(body)
+			}
 		}
 		if apiErr.Message == "" {
 			apiErr.Message = http.StatusText(resp.StatusCode)

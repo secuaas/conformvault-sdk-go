@@ -6,6 +6,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 )
 
 // FilesService handles file operations.
@@ -19,7 +20,7 @@ func (s *FilesService) List(ctx context.Context, opts *FileListOptions) ([]File,
 	if opts != nil {
 		sep := "?"
 		if opts.FolderID != nil {
-			path += sep + "folder_id=" + *opts.FolderID
+			path += sep + "folder_id=" + url.QueryEscape(*opts.FolderID)
 			sep = "&"
 		}
 		if opts.Page > 0 {

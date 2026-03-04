@@ -3,6 +3,7 @@ package conformvault
 import (
 	"context"
 	"fmt"
+	"net/url"
 )
 
 // FoldersService handles folder operations.
@@ -16,7 +17,7 @@ func (s *FoldersService) List(ctx context.Context, opts *FolderListOptions) ([]F
 	if opts != nil {
 		sep := "?"
 		if opts.ParentID != nil {
-			path += sep + "parent_id=" + *opts.ParentID
+			path += sep + "parent_id=" + url.QueryEscape(*opts.ParentID)
 			sep = "&"
 		}
 		if opts.Page > 0 {

@@ -5,6 +5,34 @@ All notable changes to the ConformVault Go SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-03-04
+
+### Added
+- `MetadataService` -- AddTags, RemoveTag, GetTags, ListByTag, SetMetadata, GetMetadata, DeleteMetadataKey (7 methods)
+- `RetentionService` -- Create, List, Get, Update, Delete (5 methods)
+- `LegalHoldsService` -- Create, List, Get, Release, AddFiles, RemoveFile (6 methods)
+- `PermissionsService` -- Set, Get, Revoke (3 methods)
+- `CommentsService` -- Create, List, Get, Update, Delete, GetReplies (6 methods)
+- `QuotaService` -- Get (1 method)
+- `RateLimitService` -- Get (1 method)
+- `UploadSessionsService` -- Create, UploadChunk, GetStatus, Complete, Cancel (5 methods)
+- `JobsService` -- Create, List, Get, Cancel (4 methods)
+- `ActivitySubscriptionsService` -- Subscribe, List, Unsubscribe (3 methods)
+- `PoliciesService` -- GetIPPolicy, SetIPPolicy, GetMFAPolicy, SetMFAPolicy, GetEncryptionSalt, SetEncryptionSalt (6 methods)
+- `Webhooks`: ListDeliveries, GetDelivery, ReplayDelivery, ReEnable (4 new methods)
+- `Audit`: Search, Export (raw stream), GetStats, GetAnomalies (4 new methods)
+- `Files`: GetThumbnail (raw stream), GetScanReport (2 new methods)
+- Pointer helper functions: `String()`, `Bool()`, `Int()`
+- 30+ new types in `types.go`
+- Total services: 16 -> 27
+
+### Fixed
+- URL-encode all query parameter values using `net/url.QueryEscape` (prevents injection via crafted filter values)
+- Fix double-read of HTTP error response body in `do()` method; also cap error body reads to 1 MB
+
+### Changed
+- CONTRIBUTING.md and SECURITY.md added for open-source readiness
+
 ## [0.4.0] - 2026-03-02
 
 ### Added

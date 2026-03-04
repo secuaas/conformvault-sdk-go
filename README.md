@@ -108,7 +108,7 @@ API keys prefixed with `cvk_live_` are for production; `cvk_test_` for sandbox.
 
 ## Services
 
-The SDK provides 16 service clients matching the ConformVault Developer API:
+The SDK provides 27 service clients matching the ConformVault Developer API:
 
 | Service | Description | Accessor |
 |---------|-------------|----------|
@@ -128,6 +128,17 @@ The SDK provides 16 service clients matching the ConformVault Developer API:
 | **Transactions** | Transaction folders with checklist items | `client.Transactions` |
 | **Templates** | Document templates and PDF generation | `client.Templates` |
 | **Batches** | Batch upload operations | `client.Batches` |
+| **Metadata** | File metadata and tags management | `client.Metadata` |
+| **Retention** | Retention policy management | `client.Retention` |
+| **LegalHolds** | Legal hold management | `client.LegalHolds` |
+| **Permissions** | Folder permission management | `client.Permissions` |
+| **Comments** | File comment management | `client.Comments` |
+| **Quota** | Storage quota information | `client.Quota` |
+| **RateLimit** | Rate limit status | `client.RateLimit` |
+| **UploadSessions** | Chunked upload session management | `client.UploadSessions` |
+| **Jobs** | Background job management | `client.Jobs` |
+| **ActivitySubscriptions** | Activity event subscriptions | `client.ActivitySubscriptions` |
+| **Policies** | Security policies (IP, MFA, encryption salt) | `client.Policies` |
 
 ## Files
 
@@ -569,19 +580,20 @@ type RateLimitError struct {
 
 ## Helper Functions
 
-The SDK does not include pointer-helper functions. For optional `*string` and `*bool` fields, use inline helpers or a utility:
+The SDK provides pointer-helper functions for optional fields:
 
 ```go
-// Pointer helpers (define in your code)
-func String(s string) *string { return &s }
-func Bool(b bool) *bool { return &b }
+// Built-in helpers
+cv.String("value")  // returns *string
+cv.Bool(true)       // returns *bool
+cv.Int(42)          // returns *int
 
 // Usage
-client.Files.Upload(ctx, reader, "file.pdf", String("folder-id"))
+client.Files.Upload(ctx, reader, "file.pdf", cv.String("folder-id"))
 client.ShareLinks.Create(ctx, cv.CreateShareLinkRequest{
-	FileID:   String("file-id"),
+	FileID:   cv.String("file-id"),
 	Type:     "download",
-	Password: String("s3cret"),
+	Password: cv.String("s3cret"),
 })
 ```
 

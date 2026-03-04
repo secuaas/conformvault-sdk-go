@@ -3,6 +3,7 @@ package conformvault
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"time"
 )
 
@@ -46,13 +47,13 @@ type Pagination struct {
 
 // Search performs a full-text search across files and folders.
 func (s *SearchService) Search(ctx context.Context, opts SearchOptions) (*SearchResponse, error) {
-	path := fmt.Sprintf("/search?q=%s", opts.Query)
+	path := fmt.Sprintf("/search?q=%s", url.QueryEscape(opts.Query))
 
 	if opts.Types != "" {
-		path += "&types=" + opts.Types
+		path += "&types=" + url.QueryEscape(opts.Types)
 	}
 	if opts.FolderID != nil {
-		path += "&folder_id=" + *opts.FolderID
+		path += "&folder_id=" + url.QueryEscape(*opts.FolderID)
 	}
 	if opts.Page > 0 {
 		path += fmt.Sprintf("&page=%d", opts.Page)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/url"
 )
 
 // AuditService handles audit log operations.
@@ -17,15 +18,15 @@ func (s *AuditService) List(ctx context.Context, opts *AuditListOptions) ([]Audi
 	if opts != nil {
 		sep := "?"
 		if opts.EventType != "" {
-			path += sep + "event_type=" + opts.EventType
+			path += sep + "event_type=" + url.QueryEscape(opts.EventType)
 			sep = "&"
 		}
 		if opts.From != "" {
-			path += sep + "from=" + opts.From
+			path += sep + "from=" + url.QueryEscape(opts.From)
 			sep = "&"
 		}
 		if opts.To != "" {
-			path += sep + "to=" + opts.To
+			path += sep + "to=" + url.QueryEscape(opts.To)
 			sep = "&"
 		}
 		if opts.Page > 0 {
@@ -55,19 +56,19 @@ func (s *AuditService) Search(ctx context.Context, opts *AuditSearchOptions) ([]
 	if opts != nil {
 		sep := "?"
 		if opts.Query != "" {
-			path += sep + "q=" + opts.Query
+			path += sep + "q=" + url.QueryEscape(opts.Query)
 			sep = "&"
 		}
 		if opts.EventType != "" {
-			path += sep + "event_type=" + opts.EventType
+			path += sep + "event_type=" + url.QueryEscape(opts.EventType)
 			sep = "&"
 		}
 		if opts.From != "" {
-			path += sep + "from=" + opts.From
+			path += sep + "from=" + url.QueryEscape(opts.From)
 			sep = "&"
 		}
 		if opts.To != "" {
-			path += sep + "to=" + opts.To
+			path += sep + "to=" + url.QueryEscape(opts.To)
 			sep = "&"
 		}
 		if opts.Page > 0 {
@@ -95,19 +96,19 @@ func (s *AuditService) Export(ctx context.Context, opts *AuditExportOptions) (io
 	if opts != nil {
 		sep := "?"
 		if opts.Format != "" {
-			path += sep + "format=" + opts.Format
+			path += sep + "format=" + url.QueryEscape(opts.Format)
 			sep = "&"
 		}
 		if opts.EventType != "" {
-			path += sep + "event_type=" + opts.EventType
+			path += sep + "event_type=" + url.QueryEscape(opts.EventType)
 			sep = "&"
 		}
 		if opts.From != "" {
-			path += sep + "from=" + opts.From
+			path += sep + "from=" + url.QueryEscape(opts.From)
 			sep = "&"
 		}
 		if opts.To != "" {
-			path += sep + "to=" + opts.To
+			path += sep + "to=" + url.QueryEscape(opts.To)
 		}
 	}
 	req, err := s.client.newRequest(ctx, "GET", path, nil)
