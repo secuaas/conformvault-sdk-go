@@ -1,6 +1,9 @@
 package conformvault
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 // KeysService handles API key self-management.
 type KeysService struct {
@@ -8,8 +11,20 @@ type KeysService struct {
 }
 
 // List returns all API keys for the organization.
-func (s *KeysService) List(ctx context.Context) ([]APIKey, error) {
-	req, err := s.client.newRequest(ctx, "GET", "/keys", nil)
+func (s *KeysService) List(ctx context.Context, opts *KeyListOptions) ([]APIKey, error) {
+	path := "/keys"
+	if opts != nil {
+		sep := "?"
+		if opts.Page > 0 {
+			path += sep + fmt.Sprintf("page=%d", opts.Page)
+			sep = "&"
+		}
+		if opts.Limit > 0 {
+			path += sep + fmt.Sprintf("limit=%d", opts.Limit)
+		}
+	}
+
+	req, err := s.client.newRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, err
 	}

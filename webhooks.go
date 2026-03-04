@@ -1,6 +1,9 @@
 package conformvault
 
-import "context"
+import (
+	"context"
+	"fmt"
+)
 
 // WebhooksService handles webhook endpoint management.
 type WebhooksService struct {
@@ -8,8 +11,20 @@ type WebhooksService struct {
 }
 
 // List returns all registered webhook endpoints.
-func (s *WebhooksService) List(ctx context.Context) ([]WebhookEndpoint, error) {
-	req, err := s.client.newRequest(ctx, "GET", "/webhooks", nil)
+func (s *WebhooksService) List(ctx context.Context, opts *WebhookListOptions) ([]WebhookEndpoint, error) {
+	path := "/webhooks"
+	if opts != nil {
+		sep := "?"
+		if opts.Page > 0 {
+			path += sep + fmt.Sprintf("page=%d", opts.Page)
+			sep = "&"
+		}
+		if opts.Limit > 0 {
+			path += sep + fmt.Sprintf("limit=%d", opts.Limit)
+		}
+	}
+
+	req, err := s.client.newRequest(ctx, "GET", path, nil)
 	if err != nil {
 		return nil, err
 	}

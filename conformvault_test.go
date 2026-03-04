@@ -583,7 +583,7 @@ func TestWebhooksList(t *testing.T) {
 	defer srv.Close()
 
 	c := NewClient("test-key", WithBaseURL(srv.URL))
-	hooks, err := c.Webhooks.List(context.Background())
+	hooks, err := c.Webhooks.List(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -772,7 +772,7 @@ func TestKeysList(t *testing.T) {
 	defer srv.Close()
 
 	c := NewClient("test-key", WithBaseURL(srv.URL))
-	keys, err := c.Keys.List(context.Background())
+	keys, err := c.Keys.List(context.Background(), nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

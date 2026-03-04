@@ -1,11 +1,30 @@
 # Historique des Versions - ConformVault Go SDK
 
 ## Version Actuelle
-**0.5.3** - 2026-03-04
+**0.5.4** - 2026-03-04
 
 ---
 
 ## Versions
+
+### 0.5.4 - 2026-03-04
+**Commit:** `pending`
+**Type:** Patch - Add pagination support to Webhooks.List, Keys.List + PaginationInfo type
+
+### Ajouté
+- `PaginationInfo` type in `types.go` — reusable pagination metadata struct (page, limit, total)
+- `WebhookListOptions` type — query parameters for paginated webhook listing
+- `KeyListOptions` type — query parameters for paginated API key listing
+
+### Modifié
+- `WebhooksService.List` now accepts `*WebhookListOptions` for optional `page` and `limit` query params
+- `KeysService.List` now accepts `*KeyListOptions` for optional `page` and `limit` query params
+- Updated tests to pass `nil` opts to maintain backward-compatible behavior
+
+### Tests effectués
+- ✅ `go build ./...` — success
+
+---
 
 ### 0.5.3 - 2026-03-04
 **Commit:** `pending`

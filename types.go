@@ -157,7 +157,22 @@ type EmbeddedSignLinkResponse struct {
 	EnvelopeID string `json:"envelope_id"`
 }
 
+// --- Pagination ---
+
+// PaginationInfo contains pagination metadata returned by list endpoints.
+type PaginationInfo struct {
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
+	Total int `json:"total"`
+}
+
 // --- Webhooks ---
+
+// WebhookListOptions are query parameters for listing webhook endpoints.
+type WebhookListOptions struct {
+	Page  int `json:"page,omitempty"`
+	Limit int `json:"limit,omitempty"`
+}
 
 // WebhookEndpoint represents a registered webhook endpoint.
 type WebhookEndpoint struct {
@@ -204,6 +219,12 @@ type AuditListOptions struct {
 }
 
 // --- API Keys ---
+
+// KeyListOptions are query parameters for listing API keys.
+type KeyListOptions struct {
+	Page  int `json:"page,omitempty"`
+	Limit int `json:"limit,omitempty"`
+}
 
 // APIKey represents a developer API key.
 type APIKey struct {
