@@ -115,6 +115,48 @@ type CreateSignatureSigner struct {
 	SignOrder int    `json:"sign_order,omitempty"`
 }
 
+// --- PDF Analysis (Signatures) ---
+
+// PDFPageDimension represents the dimensions of a single PDF page.
+type PDFPageDimension struct {
+	PageNumber int     `json:"page_number"`
+	Width      float64 `json:"width"`
+	Height     float64 `json:"height"`
+}
+
+// PDFFieldSuggestion represents a suggested signature field placement.
+type PDFFieldSuggestion struct {
+	SignerIndex int     `json:"signer_index"`
+	FieldType   string  `json:"field_type"`
+	PageNumber  int     `json:"page_number"`
+	X           float64 `json:"x"`
+	Y           float64 `json:"y"`
+	Width       float64 `json:"width"`
+	Height      float64 `json:"height"`
+	Confidence  string  `json:"confidence"`
+	Label       string  `json:"label"`
+}
+
+// PDFAnalysisResult contains the results of a PDF analysis for signature placement.
+type PDFAnalysisResult struct {
+	PageCount       int                  `json:"page_count"`
+	PageDimensions  []PDFPageDimension   `json:"page_dimensions"`
+	SuggestedFields []PDFFieldSuggestion `json:"suggested_fields"`
+	DetectedLabels  []string             `json:"detected_labels,omitempty"`
+}
+
+// AnalyzePDFRequest is the input for analyzing a PDF for signature fields.
+type AnalyzePDFRequest struct {
+	FileID      string `json:"file_id"`
+	SignerCount int    `json:"signer_count,omitempty"`
+}
+
+// EmbeddedSignLinkResponse is the response containing an embedded signing link.
+type EmbeddedSignLinkResponse struct {
+	SignLink   string `json:"sign_link"`
+	EnvelopeID string `json:"envelope_id"`
+}
+
 // --- Webhooks ---
 
 // WebhookEndpoint represents a registered webhook endpoint.

@@ -3,6 +3,7 @@ package conformvault
 import (
 	"context"
 	"io"
+	"net/url"
 )
 
 // SignaturesService handles electronic signature operations.
@@ -77,4 +78,43 @@ func (s *SignaturesService) Revoke(ctx context.Context, envelopeID string) error
 		return err
 	}
 	return s.client.do(req, nil)
+}
+
+// AnalyzePDF analyzes a PDF for signature field placement.
+func (s *SignaturesService) AnalyzePDF(ctx context.Context, req AnalyzePDFRequest) (*PDFAnalysisResult, error) {
+	r, err := s.client.newRequest(ctx, "POST", "/signatures/analyze", req)
+	if err != nil {
+		return nil, err
+	}
+	var resp DataResponse[PDFAnalysisResult]
+	if err := s.client.do(r, &resp); err != nil {
+		return nil, err
+	}
+	return &resp.Data, nil
+}
+
+// PreviewPDF streams a decrypted PDF for signature placement preview.
+func (s *SignaturesService) PreviewPDF(ctx context.Context, fileID string) (io.ReadCloser, error) {
+	r, err := s.client.newRequest(ctx, "GET", "/signatures/preview-pdf?file_id="+url.QueryEscape(fileID), nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.doRaw(r)
+}
+
+// GetEmbeddedSignLink retrieves an embedded signing link for a signer.
+func (s *SignaturesService) GetEmbeddedSignLink(ctx context.Context, envelopeID, signerEmail string, redirectURL ...string) (*EmbeddedSignLinkResponse, error) {
+	path := "/signatures/" + envelopeID + "/embed-sign?signer_email=" + url.QueryEscape(signerEmail)
+	if len(redirectURL) > 0 && redirectURL[0] != "" {
+		path += "&redirect_url=" + url.QueryEscape(redirectURL[0])
+	}
+	r, err := s.client.newRequest(ctx, "GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	var resp EmbeddedSignLinkResponse
+	if err := s.client.do(r, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
 }

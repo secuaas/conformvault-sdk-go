@@ -1,11 +1,26 @@
 # Historique des Versions - ConformVault Go SDK
 
 ## Version Actuelle
-**0.5.2** - 2026-03-04
+**0.5.3** - 2026-03-04
 
 ---
 
 ## Versions
+
+### 0.5.3 - 2026-03-04
+**Commit:** `pending`
+**Type:** Patch - Add 3 new signature methods (AnalyzePDF, PreviewPDF, GetEmbeddedSignLink)
+
+### Ajouté
+- `SignaturesService.AnalyzePDF` — Analyze a PDF for signature field placement (POST /signatures/analyze)
+- `SignaturesService.PreviewPDF` — Stream a decrypted PDF for signature placement preview (GET /signatures/preview-pdf)
+- `SignaturesService.GetEmbeddedSignLink` — Retrieve an embedded signing link for a signer (GET /signatures/{id}/embed-sign)
+- New types: `PDFPageDimension`, `PDFFieldSuggestion`, `PDFAnalysisResult`, `AnalyzePDFRequest`, `EmbeddedSignLinkResponse`
+
+### Tests effectués
+- ✅ `go build ./...` — success
+
+---
 
 ### 0.5.2 - 2026-03-04
 **Commit:** `pending`

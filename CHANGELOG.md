@@ -5,6 +5,14 @@ All notable changes to the ConformVault Go SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.3] - 2026-03-04
+
+### Added
+- `SignaturesService.AnalyzePDF` — analyze a PDF for signature field placement (`POST /signatures/analyze`)
+- `SignaturesService.PreviewPDF` — stream a decrypted PDF for signature placement preview (`GET /signatures/preview-pdf`)
+- `SignaturesService.GetEmbeddedSignLink` — retrieve an embedded signing link for a signer (`GET /signatures/{id}/embed-sign`)
+- New types: `PDFPageDimension`, `PDFFieldSuggestion`, `PDFAnalysisResult`, `AnalyzePDFRequest`, `EmbeddedSignLinkResponse`
+
 ## [0.5.2] - 2026-03-04
 
 ### Added

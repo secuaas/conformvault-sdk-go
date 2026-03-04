@@ -21,7 +21,7 @@ const (
 	// DefaultBaseURL is the default API base URL.
 	DefaultBaseURL = "https://api.conformvault.com/dev/v1"
 	// Version is the SDK version.
-	Version = "0.5.2"
+	Version = "0.5.3"
 	// userAgent is the User-Agent header value.
 	userAgent = "conformvault-go/" + Version
 )
