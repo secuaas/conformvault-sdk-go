@@ -5,6 +5,12 @@ All notable changes to the ConformVault Go SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.2] - 2026-03-04
+
+### Added
+- 51 unit tests using `go test` — covers all 29 services with `httptest` mock server
+- Test infrastructure with `net/http/httptest`
+
 ## [0.5.1] - 2026-03-04
 
 ### Fixed

@@ -1,11 +1,25 @@
 # Historique des Versions - ConformVault Go SDK
 
 ## Version Actuelle
-**0.5.1** - 2026-03-04
+**0.5.2** - 2026-03-04
 
 ---
 
 ## Versions
+
+### 0.5.2 - 2026-03-04
+**Commit:** `pending`
+**Type:** Patch - Add unit tests (51 tests via go test)
+
+### Ajouté
+- 51 unit tests using go test — covers all services with httptest mock server
+- Test infrastructure with net/http/httptest
+
+### Tests effectués
+- ✅ `go build ./...` — success
+- ✅ `go test ./...` — 51 tests passing
+
+---
 
 ### 0.5.1 - 2026-03-04
 **Commit:** `pending`
