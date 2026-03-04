@@ -21,7 +21,7 @@ const (
 	// DefaultBaseURL is the default API base URL.
 	DefaultBaseURL = "https://api.conformvault.com/dev/v1"
 	// Version is the SDK version.
-	Version = "0.5.0"
+	Version = "0.5.1"
 	// userAgent is the User-Agent header value.
 	userAgent = "conformvault-go/" + Version
 )
@@ -59,6 +59,8 @@ type Client struct {
 	Jobs                  *JobsService
 	ActivitySubscriptions *ActivitySubscriptionsService
 	Policies              *PoliciesService
+	Bandwidth             *BandwidthService
+	DataExport            *DataExportService
 }
 
 // Option configures the client.
@@ -119,6 +121,8 @@ func NewClient(apiKey string, opts ...Option) *Client {
 	c.Jobs = &JobsService{client: c}
 	c.ActivitySubscriptions = &ActivitySubscriptionsService{client: c}
 	c.Policies = &PoliciesService{client: c}
+	c.Bandwidth = &BandwidthService{client: c}
+	c.DataExport = &DataExportService{client: c}
 
 	return c
 }

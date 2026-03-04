@@ -5,6 +5,25 @@ All notable changes to the ConformVault Go SDK will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.1] - 2026-03-04
+
+### Fixed
+- **Policies**: paths corrected from `/policies/ip` to `/ip-policy`, `/policies/mfa` to `/mfa-policy`, `/policies/encryption-salt` to `/encryption/salt`
+- **Activity Subscriptions**: path corrected from `/activity/subscriptions` to `/activity-subscriptions`
+- **Comments**: rewritten from nested `/files/{id}/comments` to flat `/comments` routes; Update method changed from PATCH to PUT
+- **Jobs Cancel**: changed from `POST /jobs/{id}/cancel` to `DELETE /jobs/{id}`
+- **Batches Cancel**: changed from `POST /batches/{id}/cancel` to `DELETE /batches/{id}`
+- **Retention Update**: changed from PATCH to PUT
+
+### Added
+- `BandwidthService` — GetSummary, GetDaily (2 methods)
+- `DataExportService` — Export for GDPR/Loi 25 (1 method)
+- `KeysService`: InstantRevoke, GetRevocationStatus (2 new methods via `/api-keys/` path)
+- `BatchesService`: UploadFile (1 new method)
+- New types: `BandwidthSummary`, `DailyBandwidthStats`, `KeyRevocationStatus`, `UserDataExport`
+- `FileID` field added to `CreateCommentRequest`
+- Total services: 27 → 29
+
 ## [0.5.0] - 2026-03-04
 
 ### Added

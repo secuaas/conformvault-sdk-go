@@ -3,6 +3,8 @@ package conformvault
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 )
 
 // BatchesService handles batch operation endpoints.
@@ -130,9 +132,30 @@ func (s *BatchesService) Commit(ctx context.Context, id string) (*BatchOperation
 
 // Cancel cancels a batch operation.
 func (s *BatchesService) Cancel(ctx context.Context, id string) error {
-	req, err := s.client.newRequest(ctx, "POST", "/batches/"+id+"/cancel", nil)
+	req, err := s.client.newRequest(ctx, "DELETE", "/batches/"+id, nil)
 	if err != nil {
 		return err
 	}
 	return s.client.do(req, nil)
+}
+
+// UploadFile uploads a file to a batch operation at the given index.
+func (s *BatchesService) UploadFile(ctx context.Context, batchID string, index int, body io.Reader, contentType string) (*BatchOperationResponse, error) {
+	path := fmt.Sprintf("/batches/%s/files/%d", batchID, index)
+	req, err := http.NewRequestWithContext(ctx, "PUT", s.client.baseURL+path, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+s.client.apiKey)
+	req.Header.Set("User-Agent", userAgent)
+	if contentType != "" {
+		req.Header.Set("Content-Type", contentType)
+	} else {
+		req.Header.Set("Content-Type", "application/octet-stream")
+	}
+	var resp DataResponse[BatchOperationResponse]
+	if err := s.client.do(req, &resp); err != nil {
+		return nil, err
+	}
+	return &resp.Data, nil
 }

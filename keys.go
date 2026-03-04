@@ -71,3 +71,32 @@ func (s *KeysService) Rotate(ctx context.Context, keyID string) (*CreateAPIKeyRe
 	}
 	return &resp.Data, nil
 }
+
+// KeyRevocationStatus represents the revocation status of an API key.
+type KeyRevocationStatus struct {
+	KeyID     string `json:"key_id"`
+	Revoked   bool   `json:"revoked"`
+	RevokedAt string `json:"revoked_at,omitempty"`
+}
+
+// InstantRevoke instantly revokes an API key via Redis.
+func (s *KeysService) InstantRevoke(ctx context.Context, keyID string) error {
+	req, err := s.client.newRequest(ctx, "POST", "/api-keys/"+keyID+"/revoke", nil)
+	if err != nil {
+		return err
+	}
+	return s.client.do(req, nil)
+}
+
+// GetRevocationStatus checks the revocation status of an API key.
+func (s *KeysService) GetRevocationStatus(ctx context.Context, keyID string) (*KeyRevocationStatus, error) {
+	req, err := s.client.newRequest(ctx, "GET", "/api-keys/"+keyID+"/revocation-status", nil)
+	if err != nil {
+		return nil, err
+	}
+	var resp DataResponse[KeyRevocationStatus]
+	if err := s.client.do(req, &resp); err != nil {
+		return nil, err
+	}
+	return &resp.Data, nil
+}

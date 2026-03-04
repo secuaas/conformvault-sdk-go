@@ -408,6 +408,7 @@ type Comment struct {
 
 // CreateCommentRequest is the input for creating a comment.
 type CreateCommentRequest struct {
+	FileID   string  `json:"file_id"`
 	Content  string  `json:"content"`
 	ParentID *string `json:"parent_id,omitempty"`
 }

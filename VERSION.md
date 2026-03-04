@@ -1,11 +1,37 @@
 # Historique des Versions - ConformVault Go SDK
 
 ## Version Actuelle
-**0.5.0** - 2026-03-04
+**0.5.1** - 2026-03-04
 
 ---
 
 ## Versions
+
+### 0.5.1 - 2026-03-04
+**Commit:** `pending`
+**Type:** Patch - Fix 9 route mismatches + add 6 missing routes (backend alignment)
+
+### Corrigé
+- **Policies**: `/policies/ip` → `/ip-policy`, `/policies/mfa` → `/mfa-policy`, `/policies/encryption-salt` → `/encryption/salt`
+- **Activity Subscriptions**: `/activity/subscriptions` → `/activity-subscriptions`
+- **Comments**: Rewritten from nested `/files/{id}/comments` to flat `/comments` routes; `file_id` moved to request body/query param; Update changed from PATCH to PUT
+- **Jobs Cancel**: `POST /jobs/{id}/cancel` → `DELETE /jobs/{id}`
+- **Batches Cancel**: `POST /batches/{id}/cancel` → `DELETE /batches/{id}`
+- **Retention Update**: PATCH → PUT
+
+### Ajouté
+- **`bandwidth.go`**: `BandwidthService` — GetSummary (`GET /bandwidth`), GetDaily (`GET /bandwidth/daily`)
+- **`data_export.go`**: `DataExportService` — Export (`GET /users/{id}/export`) for GDPR/Loi 25
+- **`keys.go`**: InstantRevoke (`POST /api-keys/{id}/revoke`), GetRevocationStatus (`GET /api-keys/{id}/revocation-status`)
+- **`batches.go`**: UploadFile (`PUT /batches/{id}/files/{index}`)
+- New types: `BandwidthSummary`, `DailyBandwidthStats`, `KeyRevocationStatus`, `UserDataExport`
+- `FileID` field added to `CreateCommentRequest`
+- Total services: 27 → 29
+
+### Tests effectués
+- ✅ `go build ./...` — success
+
+---
 
 ### 0.5.0 - 2026-03-04
 **Commit:** `pending`

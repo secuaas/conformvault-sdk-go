@@ -48,7 +48,7 @@ func (s *JobsService) Get(ctx context.Context, jobID string) (*Job, error) {
 
 // Cancel cancels a background job.
 func (s *JobsService) Cancel(ctx context.Context, jobID string) error {
-	req, err := s.client.newRequest(ctx, "POST", "/jobs/"+jobID+"/cancel", nil)
+	req, err := s.client.newRequest(ctx, "DELETE", "/jobs/"+jobID, nil)
 	if err != nil {
 		return err
 	}

@@ -9,7 +9,7 @@ type PoliciesService struct {
 
 // GetIPPolicy returns the current IP restriction policy.
 func (s *PoliciesService) GetIPPolicy(ctx context.Context) (*IPPolicy, error) {
-	req, err := s.client.newRequest(ctx, "GET", "/policies/ip", nil)
+	req, err := s.client.newRequest(ctx, "GET", "/ip-policy", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func (s *PoliciesService) GetIPPolicy(ctx context.Context) (*IPPolicy, error) {
 
 // SetIPPolicy updates the IP restriction policy.
 func (s *PoliciesService) SetIPPolicy(ctx context.Context, request SetIPPolicyRequest) (*IPPolicy, error) {
-	req, err := s.client.newRequest(ctx, "PUT", "/policies/ip", request)
+	req, err := s.client.newRequest(ctx, "PUT", "/ip-policy", request)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (s *PoliciesService) SetIPPolicy(ctx context.Context, request SetIPPolicyRe
 
 // GetMFAPolicy returns the current MFA policy.
 func (s *PoliciesService) GetMFAPolicy(ctx context.Context) (*MFAPolicy, error) {
-	req, err := s.client.newRequest(ctx, "GET", "/policies/mfa", nil)
+	req, err := s.client.newRequest(ctx, "GET", "/mfa-policy", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (s *PoliciesService) GetMFAPolicy(ctx context.Context) (*MFAPolicy, error) 
 
 // SetMFAPolicy updates the MFA policy.
 func (s *PoliciesService) SetMFAPolicy(ctx context.Context, request SetMFAPolicyRequest) (*MFAPolicy, error) {
-	req, err := s.client.newRequest(ctx, "PUT", "/policies/mfa", request)
+	req, err := s.client.newRequest(ctx, "PUT", "/mfa-policy", request)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (s *PoliciesService) SetMFAPolicy(ctx context.Context, request SetMFAPolicy
 
 // GetEncryptionSalt returns the current encryption salt.
 func (s *PoliciesService) GetEncryptionSalt(ctx context.Context) (*EncryptionSalt, error) {
-	req, err := s.client.newRequest(ctx, "GET", "/policies/encryption-salt", nil)
+	req, err := s.client.newRequest(ctx, "GET", "/encryption/salt", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (s *PoliciesService) GetEncryptionSalt(ctx context.Context) (*EncryptionSal
 
 // SetEncryptionSalt updates the encryption salt.
 func (s *PoliciesService) SetEncryptionSalt(ctx context.Context, request SetEncryptionSaltRequest) (*EncryptionSalt, error) {
-	req, err := s.client.newRequest(ctx, "PUT", "/policies/encryption-salt", request)
+	req, err := s.client.newRequest(ctx, "PUT", "/encryption/salt", request)
 	if err != nil {
 		return nil, err
 	}

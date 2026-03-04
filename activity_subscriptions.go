@@ -9,7 +9,7 @@ type ActivitySubscriptionsService struct {
 
 // Subscribe creates a new activity event subscription.
 func (s *ActivitySubscriptionsService) Subscribe(ctx context.Context, request CreateActivitySubscriptionRequest) (*ActivitySubscription, error) {
-	req, err := s.client.newRequest(ctx, "POST", "/activity/subscriptions", request)
+	req, err := s.client.newRequest(ctx, "POST", "/activity-subscriptions", request)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func (s *ActivitySubscriptionsService) Subscribe(ctx context.Context, request Cr
 
 // List returns all activity event subscriptions.
 func (s *ActivitySubscriptionsService) List(ctx context.Context) ([]ActivitySubscription, error) {
-	req, err := s.client.newRequest(ctx, "GET", "/activity/subscriptions", nil)
+	req, err := s.client.newRequest(ctx, "GET", "/activity-subscriptions", nil)
 	if err != nil {
 		return nil, err
 	}

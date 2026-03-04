@@ -48,7 +48,7 @@ func (s *RetentionService) Get(ctx context.Context, policyID string) (*Retention
 
 // Update updates an existing retention policy.
 func (s *RetentionService) Update(ctx context.Context, policyID string, request UpdateRetentionPolicyRequest) (*RetentionPolicy, error) {
-	req, err := s.client.newRequest(ctx, "PATCH", "/retention-policies/"+policyID, request)
+	req, err := s.client.newRequest(ctx, "PUT", "/retention-policies/"+policyID, request)
 	if err != nil {
 		return nil, err
 	}
