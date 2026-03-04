@@ -110,35 +110,35 @@ API keys prefixed with `cvk_live_` are for production; `cvk_test_` for sandbox.
 
 The SDK provides 27 service clients matching the ConformVault Developer API:
 
-| Service | Description | Accessor |
-|---------|-------------|----------|
-| **Files** | Upload, download, list, delete files | `client.Files` |
-| **Folders** | Create, list, get, delete folders | `client.Folders` |
-| **ShareLinks** | Create and manage share links | `client.ShareLinks` |
-| **Signatures** | Electronic signature envelopes | `client.Signatures` |
-| **Webhooks** | Register and manage webhook endpoints | `client.Webhooks` |
-| **Audit** | Query audit log entries | `client.Audit` |
-| **Keys** | API key self-management | `client.Keys` |
-| **Bulk** | Bulk delete, move, and download files | `client.Bulk` |
-| **Versions** | File version history and restore | `client.Versions` |
-| **Search** | Full-text search across files and folders | `client.Search` |
-| **Trash** | Recycle bin: list, restore, permanently delete | `client.Trash` |
-| **ScanReports** | Antivirus scan reports and summaries | `client.ScanReports` |
-| **Attestation** | Compliance attestation PDF generation | `client.Attestation` |
-| **Transactions** | Transaction folders with checklist items | `client.Transactions` |
-| **Templates** | Document templates and PDF generation | `client.Templates` |
-| **Batches** | Batch upload operations | `client.Batches` |
-| **Metadata** | File metadata and tags management | `client.Metadata` |
-| **Retention** | Retention policy management | `client.Retention` |
-| **LegalHolds** | Legal hold management | `client.LegalHolds` |
-| **Permissions** | Folder permission management | `client.Permissions` |
-| **Comments** | File comment management | `client.Comments` |
-| **Quota** | Storage quota information | `client.Quota` |
-| **RateLimit** | Rate limit status | `client.RateLimit` |
-| **UploadSessions** | Chunked upload session management | `client.UploadSessions` |
-| **Jobs** | Background job management | `client.Jobs` |
-| **ActivitySubscriptions** | Activity event subscriptions | `client.ActivitySubscriptions` |
-| **Policies** | Security policies (IP, MFA, encryption salt) | `client.Policies` |
+| Service | Methods | Accessor |
+|---------|---------|----------|
+| **Files** | `List`, `Get`, `Upload`, `Download`, `Delete`, `GetThumbnail`, `GetScanReport` | `client.Files` |
+| **Folders** | `List`, `Get`, `Create`, `Delete` | `client.Folders` |
+| **ShareLinks** | `List`, `Create`, `Delete` | `client.ShareLinks` |
+| **Signatures** | `Create`, `GetStatus`, `DownloadSigned`, `Revoke` | `client.Signatures` |
+| **Webhooks** | `List`, `Register`, `Delete`, `Test` | `client.Webhooks` |
+| **Audit** | `List` | `client.Audit` |
+| **Keys** | `List`, `Create`, `Get`, `Revoke`, `Rotate` | `client.Keys` |
+| **Bulk** | `Delete`, `Move`, `Download` | `client.Bulk` |
+| **Versions** | `List`, `Get`, `Restore`, `Delete` | `client.Versions` |
+| **Search** | `Search` | `client.Search` |
+| **Trash** | `List`, `Restore`, `Delete`, `Empty` | `client.Trash` |
+| **ScanReports** | `GetReport`, `List`, `GetSummary` | `client.ScanReports` |
+| **Attestation** | `GenerateLoi25` | `client.Attestation` |
+| **Transactions** | `Create`, `List`, `Get`, `Delete`, `AddItem`, `UpdateItem`, `DeleteItem` | `client.Transactions` |
+| **Templates** | `Create`, `List`, `Generate`, `ListDocuments` | `client.Templates` |
+| **Batches** | `Create`, `List`, `Get`, `Commit`, `Cancel` | `client.Batches` |
+| **Metadata** | `AddTags`, `GetTags`, `ListByTag`, `RemoveTag`, `SetMetadata`, `GetMetadata`, `DeleteMetadataKey` | `client.Metadata` |
+| **Retention** | `Create`, `List`, `Update`, `Delete` | `client.Retention` |
+| **LegalHolds** | `Create`, `List`, `Release`, `AddFiles`, `RemoveFile` | `client.LegalHolds` |
+| **Permissions** | `Set`, `Get`, `Revoke` | `client.Permissions` |
+| **Comments** | `Create`, `List`, `Update`, `Delete`, `GetReplies` | `client.Comments` |
+| **Quota** | `Get` | `client.Quota` |
+| **RateLimit** | `Get` | `client.RateLimit` |
+| **UploadSessions** | `Create`, `UploadChunk`, `Complete`, `Cancel` | `client.UploadSessions` |
+| **Jobs** | `Create`, `List`, `Get`, `Cancel` | `client.Jobs` |
+| **ActivitySubscriptions** | `Subscribe`, `List`, `Unsubscribe` | `client.ActivitySubscriptions` |
+| **Policies** | `GetIPPolicy`, `SetIPPolicy`, `GetMFAPolicy`, `SetMFAPolicy`, `GetEncryptionSalt`, `SetEncryptionSalt` | `client.Policies` |
 
 ## Files
 
@@ -520,6 +520,227 @@ list, err := client.Batches.List(ctx, 1, 20)
 
 // Cancel a batch
 err = client.Batches.Cancel(ctx, batch.ID)
+```
+
+## File Metadata & Tags
+
+```go
+// Add tags to a file
+tags, err := client.Metadata.AddTags(ctx, "file-id", cv.AddTagsRequest{
+	Tags: []string{"confidential", "legal", "q1-2025"},
+})
+
+// Get all tags for a file
+tags, err = client.Metadata.GetTags(ctx, "file-id")
+
+// List all files with a specific tag
+files, err := client.Metadata.ListByTag(ctx, "confidential")
+
+// Remove a tag
+err = client.Metadata.RemoveTag(ctx, "file-id", "q1-2025")
+
+// Set metadata key-value pairs
+meta, err := client.Metadata.SetMetadata(ctx, "file-id", cv.SetMetadataRequest{
+	Metadata: map[string]string{
+		"department": "legal",
+		"case_number": "2025-001",
+	},
+})
+
+// Get metadata
+meta, err = client.Metadata.GetMetadata(ctx, "file-id")
+
+// Delete a metadata key
+err = client.Metadata.DeleteMetadataKey(ctx, "file-id", "case_number")
+```
+
+## Retention Policies
+
+```go
+// Create a retention policy
+policy, err := client.Retention.Create(ctx, cv.CreateRetentionPolicyRequest{
+	Name:          "7-Year Legal Hold",
+	RetentionDays: 2555,
+	AutoDelete:    false,
+})
+
+// List all policies
+policies, err := client.Retention.List(ctx)
+
+// Update a policy
+updated, err := client.Retention.Update(ctx, policy.ID, cv.UpdateRetentionPolicyRequest{
+	AutoDelete: cv.Bool(true),
+})
+
+// Delete a policy
+err = client.Retention.Delete(ctx, policy.ID)
+```
+
+## Legal Holds
+
+```go
+// Create a legal hold
+hold, err := client.LegalHolds.Create(ctx, cv.CreateLegalHoldRequest{
+	Name:        "Case 2025-001",
+	Description: "Litigation hold for pending lawsuit",
+})
+
+// Add files to the hold
+files, err := client.LegalHolds.AddFiles(ctx, hold.ID, cv.AddLegalHoldFilesRequest{
+	FileIDs: []string{"file-1", "file-2", "file-3"},
+})
+
+// List all holds
+holds, err := client.LegalHolds.List(ctx)
+
+// Release a hold
+released, err := client.LegalHolds.Release(ctx, hold.ID)
+
+// Remove a file from a hold
+err = client.LegalHolds.RemoveFile(ctx, hold.ID, "file-1")
+```
+
+## Folder Permissions
+
+```go
+// Set permissions on a folder
+perm, err := client.Permissions.Set(ctx, "folder-id", cv.SetFolderPermissionRequest{
+	UserID:     "user-id",
+	Permission: "write",
+})
+
+// Get folder permissions
+perms, err := client.Permissions.Get(ctx, "folder-id")
+
+// Revoke a user's permission
+err = client.Permissions.Revoke(ctx, "folder-id", "user-id")
+```
+
+## Comments
+
+```go
+// Add a comment to a file
+comment, err := client.Comments.Create(ctx, "file-id", cv.CreateCommentRequest{
+	Content: "Please review section 3 before signing.",
+})
+
+// Reply to a comment
+reply, err := client.Comments.Create(ctx, "file-id", cv.CreateCommentRequest{
+	Content:  "Section 3 looks good to me.",
+	ParentID: &comment.ID,
+})
+
+// List comments on a file
+comments, err := client.Comments.List(ctx, "file-id")
+
+// Get replies to a comment
+replies, err := client.Comments.GetReplies(ctx, "file-id", comment.ID)
+
+// Update a comment
+updated, err := client.Comments.Update(ctx, "file-id", comment.ID, cv.UpdateCommentRequest{
+	Content: "Updated: Please review sections 3 and 4.",
+})
+
+// Delete a comment
+err = client.Comments.Delete(ctx, "file-id", comment.ID)
+```
+
+## Quota & Rate Limits
+
+```go
+// Get storage quota
+quota, err := client.Quota.Get(ctx)
+fmt.Printf("Used: %d / %d bytes (%d files)\n",
+	quota.UsedBytes, quota.TotalBytes, quota.FileCount)
+
+// Get rate limit status
+rl, err := client.RateLimit.Get(ctx)
+fmt.Printf("Remaining: %d/%d requests (resets at %s)\n",
+	rl.RequestsRemaining, rl.RequestsPerMinute, rl.ResetAt)
+```
+
+## Upload Sessions (Chunked Uploads)
+
+```go
+// Create an upload session for a large file
+session, err := client.UploadSessions.Create(ctx, cv.CreateUploadSessionRequest{
+	Filename:    "large-backup.zip",
+	TotalSize:   5368709120, // 5 GB
+	ContentType: "application/zip",
+})
+
+// Upload chunks
+for i := 0; i < session.TotalChunks; i++ {
+	chunk := getChunkReader(i) // your chunk data
+	err = client.UploadSessions.UploadChunk(ctx, session.ID, i, chunk)
+}
+
+// Complete the session
+file, err := client.UploadSessions.Complete(ctx, session.ID)
+fmt.Printf("Upload complete: %s\n", file.ID)
+
+// Or cancel if needed
+err = client.UploadSessions.Cancel(ctx, session.ID)
+```
+
+## Background Jobs
+
+```go
+// Create a background job
+job, err := client.Jobs.Create(ctx, cv.CreateJobRequest{
+	Type:   "export",
+	Params: map[string]any{"folder_id": "folder-id", "format": "zip"},
+})
+
+// Poll job status
+job, err = client.Jobs.Get(ctx, job.ID)
+fmt.Printf("Job %s: %s (%d%% complete)\n", job.ID, job.Status, job.Progress)
+
+// List all jobs
+jobs, err := client.Jobs.List(ctx)
+
+// Cancel a job
+err = client.Jobs.Cancel(ctx, job.ID)
+```
+
+## Activity Subscriptions
+
+```go
+// Subscribe to activity events
+sub, err := client.ActivitySubscriptions.Subscribe(ctx, cv.CreateActivitySubscriptionRequest{
+	EventTypes:  []string{"file.uploaded", "file.deleted"},
+	CallbackURL: "https://your-app.com/activity",
+})
+
+// List subscriptions
+subs, err := client.ActivitySubscriptions.List(ctx)
+
+// Unsubscribe
+err = client.ActivitySubscriptions.Unsubscribe(ctx, sub.ID)
+```
+
+## Security Policies
+
+```go
+// Get and set IP restriction policy
+ipPolicy, err := client.Policies.GetIPPolicy(ctx)
+ipPolicy, err = client.Policies.SetIPPolicy(ctx, cv.SetIPPolicyRequest{
+	Enabled:    true,
+	AllowedIPs: []string{"203.0.113.0/24", "198.51.100.1"},
+})
+
+// Get and set MFA policy
+mfaPolicy, err := client.Policies.GetMFAPolicy(ctx)
+mfaPolicy, err = client.Policies.SetMFAPolicy(ctx, cv.SetMFAPolicyRequest{
+	Enabled:     true,
+	RequiredFor: []string{"file.delete", "settings.update"},
+})
+
+// Get and set encryption salt
+salt, err := client.Policies.GetEncryptionSalt(ctx)
+salt, err = client.Policies.SetEncryptionSalt(ctx, cv.SetEncryptionSaltRequest{
+	Salt: "your-base64-encoded-salt",
+})
 ```
 
 ## Error Handling
