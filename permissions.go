@@ -41,3 +41,16 @@ func (s *PermissionsService) Revoke(ctx context.Context, folderID, userID string
 	}
 	return s.client.do(req, nil)
 }
+
+// SetWithExpiry sets a temporary permission on a folder with an expiration time.
+func (s *PermissionsService) SetWithExpiry(ctx context.Context, folderID string, request SetPermissionWithExpiryRequest) (*FolderPermission, error) {
+	req, err := s.client.newRequest(ctx, "POST", "/folders/"+folderID+"/permissions", request)
+	if err != nil {
+		return nil, err
+	}
+	var resp DataResponse[FolderPermission]
+	if err := s.client.do(req, &resp); err != nil {
+		return nil, err
+	}
+	return &resp.Data, nil
+}

@@ -159,6 +159,11 @@ func TestNewClient_AllServicesNonNil(t *testing.T) {
 		"Policies":              c.Policies,
 		"Bandwidth":             c.Bandwidth,
 		"DataExport":            c.DataExport,
+		"SecretVault":           c.SecretVault,
+		"ExpectedFiles":         c.ExpectedFiles,
+		"SpaceMessaging":        c.SpaceMessaging,
+		"MSPDashboard":          c.MSPDashboard,
+		"Imports":               c.Imports,
 	}
 	for name, svc := range services {
 		if svc == nil {
@@ -1584,5 +1589,738 @@ func TestEmptyListResponse(t *testing.T) {
 	}
 	if len(files) != 0 {
 		t.Errorf("expected 0 files, got %d", len(files))
+	}
+}
+
+// ---------------------------------------------------------------------------
+// SecretVault service
+// ---------------------------------------------------------------------------
+
+func TestSecretVaultCreate(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /secrets": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 201, DataResponse[Secret]{
+				Data: Secret{ID: "sec-1", Token: "tok-abc", ContentSize: 42, MaxViews: 3, Status: "active"},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	secret, err := c.SecretVault.Create(context.Background(), CreateSecretRequest{
+		Content:  "my-secret",
+		MaxViews: 3,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if secret.ID != "sec-1" {
+		t.Errorf("expected ID 'sec-1', got %q", secret.ID)
+	}
+	if secret.Token != "tok-abc" {
+		t.Errorf("expected token 'tok-abc', got %q", secret.Token)
+	}
+	if (*logs)[0].Method != "POST" || (*logs)[0].Path != "/secrets" {
+		t.Errorf("unexpected request: %s %s", (*logs)[0].Method, (*logs)[0].Path)
+	}
+}
+
+func TestSecretVaultList(t *testing.T) {
+	srv, _ := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /secrets": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, ListResponse[Secret]{
+				Data: []Secret{{ID: "sec-1"}, {ID: "sec-2"}},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	secrets, err := c.SecretVault.List(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(secrets) != 2 {
+		t.Fatalf("expected 2 secrets, got %d", len(secrets))
+	}
+}
+
+func TestSecretVaultGet(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /secrets/sec-1": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, DataResponse[Secret]{
+				Data: Secret{ID: "sec-1", Status: "active"},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	secret, err := c.SecretVault.Get(context.Background(), "sec-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if secret.ID != "sec-1" {
+		t.Errorf("expected ID 'sec-1', got %q", secret.ID)
+	}
+	if (*logs)[0].Path != "/secrets/sec-1" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestSecretVaultDelete(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"DELETE /secrets/sec-1": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(204)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.SecretVault.Delete(context.Background(), "sec-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Method != "DELETE" || (*logs)[0].Path != "/secrets/sec-1" {
+		t.Errorf("unexpected request: %s %s", (*logs)[0].Method, (*logs)[0].Path)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Expected Files service
+// ---------------------------------------------------------------------------
+
+func TestExpectedFilesCreate(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /sharelinks/sl-1/expected-files": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 201, DataResponse[ExpectedFile]{
+				Data: ExpectedFile{ID: "ef-1", ShareLinkID: "sl-1", Label: "ID Card", IsRequired: true},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	ef, err := c.ExpectedFiles.Create(context.Background(), "sl-1", CreateExpectedFileRequest{
+		Label:      "ID Card",
+		IsRequired: true,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if ef.ID != "ef-1" {
+		t.Errorf("expected ID 'ef-1', got %q", ef.ID)
+	}
+	if (*logs)[0].Path != "/sharelinks/sl-1/expected-files" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestExpectedFilesList(t *testing.T) {
+	srv, _ := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /sharelinks/sl-1/expected-files": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, ListResponse[ExpectedFile]{
+				Data: []ExpectedFile{{ID: "ef-1"}, {ID: "ef-2"}},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	files, err := c.ExpectedFiles.List(context.Background(), "sl-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(files) != 2 {
+		t.Fatalf("expected 2 expected files, got %d", len(files))
+	}
+}
+
+func TestExpectedFilesUpdate(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"PUT /sharelinks/sl-1/expected-files/ef-1": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, DataResponse[ExpectedFile]{
+				Data: ExpectedFile{ID: "ef-1", Label: "Updated Label"},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	ef, err := c.ExpectedFiles.Update(context.Background(), "sl-1", "ef-1", UpdateExpectedFileRequest{
+		Label: String("Updated Label"),
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if ef.Label != "Updated Label" {
+		t.Errorf("expected label 'Updated Label', got %q", ef.Label)
+	}
+	if (*logs)[0].Method != "PUT" {
+		t.Errorf("expected PUT, got %s", (*logs)[0].Method)
+	}
+}
+
+func TestExpectedFilesDelete(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"DELETE /sharelinks/sl-1/expected-files/ef-1": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(204)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.ExpectedFiles.Delete(context.Background(), "sl-1", "ef-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Path != "/sharelinks/sl-1/expected-files/ef-1" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestExpectedFilesGetProgress(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /sharelinks/sl-1/expected-files/progress": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, DataResponse[ExpectedFileProgress]{
+				Data: ExpectedFileProgress{Total: 5, Fulfilled: 3, Required: 4, RequiredFulfilled: 2},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	progress, err := c.ExpectedFiles.GetProgress(context.Background(), "sl-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if progress.Total != 5 {
+		t.Errorf("expected total 5, got %d", progress.Total)
+	}
+	if progress.Fulfilled != 3 {
+		t.Errorf("expected fulfilled 3, got %d", progress.Fulfilled)
+	}
+	if (*logs)[0].Path != "/sharelinks/sl-1/expected-files/progress" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Space Messaging service
+// ---------------------------------------------------------------------------
+
+func TestSpaceMessagingSendMessage(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /spaces/sp-1/messages": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 201, DataResponse[SpaceMessage]{
+				Data: SpaceMessage{ID: "msg-1", SpaceID: "sp-1", Content: "Hello!"},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	msg, err := c.SpaceMessaging.SendMessage(context.Background(), "sp-1", CreateSpaceMessageRequest{
+		Content: "Hello!",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if msg.ID != "msg-1" {
+		t.Errorf("expected ID 'msg-1', got %q", msg.ID)
+	}
+	if (*logs)[0].Path != "/spaces/sp-1/messages" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestSpaceMessagingListMessages(t *testing.T) {
+	srv, _ := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /spaces/sp-1/messages": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, spaceMessageListResponse{
+				Data:  []SpaceMessage{{ID: "msg-1"}, {ID: "msg-2"}},
+				Total: 2,
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	msgs, total, err := c.SpaceMessaging.ListMessages(context.Background(), "sp-1", nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(msgs) != 2 {
+		t.Fatalf("expected 2 messages, got %d", len(msgs))
+	}
+	if total != 2 {
+		t.Errorf("expected total 2, got %d", total)
+	}
+}
+
+func TestSpaceMessagingGetReplies(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /spaces/sp-1/messages/msg-1/replies": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, ListResponse[SpaceMessage]{
+				Data: []SpaceMessage{{ID: "reply-1", ParentID: String("msg-1")}},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	replies, err := c.SpaceMessaging.GetReplies(context.Background(), "sp-1", "msg-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(replies) != 1 {
+		t.Fatalf("expected 1 reply, got %d", len(replies))
+	}
+	if (*logs)[0].Path != "/spaces/sp-1/messages/msg-1/replies" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestSpaceMessagingMarkRead(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /spaces/sp-1/messages/msg-1/read": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.SpaceMessaging.MarkRead(context.Background(), "sp-1", "msg-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Path != "/spaces/sp-1/messages/msg-1/read" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestSpaceMessagingDeleteMessage(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"DELETE /spaces/sp-1/messages/msg-1": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(204)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.SpaceMessaging.DeleteMessage(context.Background(), "sp-1", "msg-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Path != "/spaces/sp-1/messages/msg-1" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Retention Exceptions & Approvals
+// ---------------------------------------------------------------------------
+
+func TestRetentionCreateException(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /retention-policies/pol-1/exceptions": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 201, DataResponse[RetentionException]{
+				Data: RetentionException{ID: "exc-1", PolicyID: "pol-1", ResourceType: "file", ResourceID: "f-1"},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	exc, err := c.Retention.CreateException(context.Background(), "pol-1", CreateRetentionExceptionRequest{
+		ResourceType: "file",
+		ResourceID:   "f-1",
+		Reason:       "Legal requirement",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if exc.ID != "exc-1" {
+		t.Errorf("expected ID 'exc-1', got %q", exc.ID)
+	}
+	if (*logs)[0].Path != "/retention-policies/pol-1/exceptions" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestRetentionListExceptions(t *testing.T) {
+	srv, _ := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /retention-policies/pol-1/exceptions": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, ListResponse[RetentionException]{
+				Data: []RetentionException{{ID: "exc-1"}, {ID: "exc-2"}},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	exceptions, err := c.Retention.ListExceptions(context.Background(), "pol-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(exceptions) != 2 {
+		t.Fatalf("expected 2 exceptions, got %d", len(exceptions))
+	}
+}
+
+func TestRetentionDeleteException(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"DELETE /retention-policies/exceptions/exc-1": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(204)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.Retention.DeleteException(context.Background(), "exc-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Path != "/retention-policies/exceptions/exc-1" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestRetentionListPendingApprovals(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /retention-approvals": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, ListResponse[RetentionApproval]{
+				Data: []RetentionApproval{{ID: "appr-1", Status: "pending"}, {ID: "appr-2", Status: "pending"}},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	approvals, err := c.Retention.ListPendingApprovals(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(approvals) != 2 {
+		t.Fatalf("expected 2 approvals, got %d", len(approvals))
+	}
+	if (*logs)[0].Path != "/retention-approvals" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestRetentionDecideApproval(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /retention-approvals/appr-1/decide": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.Retention.DecideApproval(context.Background(), "appr-1", DecideApprovalRequest{
+		Decision: "approve",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Path != "/retention-approvals/appr-1/decide" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Permissions - SetWithExpiry
+// ---------------------------------------------------------------------------
+
+func TestPermissionsSetWithExpiry(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /folders/fold-1/permissions": func(w http.ResponseWriter, r *http.Request) {
+			exp := time.Now().Add(24 * time.Hour)
+			writeJSON(w, 200, DataResponse[FolderPermission]{
+				Data: FolderPermission{FolderID: "fold-1", UserID: "user-1", Permission: "read", ExpiresAt: &exp},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	perm, err := c.Permissions.SetWithExpiry(context.Background(), "fold-1", SetPermissionWithExpiryRequest{
+		UserID:     "user-1",
+		Permission: "read",
+		ExpiresAt:  time.Now().Add(24 * time.Hour),
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if perm.FolderID != "fold-1" {
+		t.Errorf("expected folder ID 'fold-1', got %q", perm.FolderID)
+	}
+	if perm.ExpiresAt == nil {
+		t.Error("expected ExpiresAt to be set")
+	}
+	if (*logs)[0].Path != "/folders/fold-1/permissions" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Signature Delegation
+// ---------------------------------------------------------------------------
+
+func TestSignaturesDelegate(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /signatures/env-1/signers/signer-1/delegate": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.Signatures.Delegate(context.Background(), "env-1", "signer-1", DelegateSignRequest{
+		DelegatedToEmail: "delegate@example.com",
+		DelegatedToName:  "John Delegate",
+		Reason:           "Out of office",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Path != "/signatures/env-1/signers/signer-1/delegate" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+	if (*logs)[0].Method != "POST" {
+		t.Errorf("expected POST, got %s", (*logs)[0].Method)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// MSP Dashboard service
+// ---------------------------------------------------------------------------
+
+func TestMSPDashboardGetDashboard(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /msp/dashboard": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, DataResponse[MSPDashboardSummary]{
+				Data: MSPDashboardSummary{TotalClients: 10, TotalUsers: 50, TotalStorageBytes: 1073741824, TotalFiles: 500, TotalSignatures: 200},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	dash, err := c.MSPDashboard.GetDashboard(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if dash.TotalClients != 10 {
+		t.Errorf("expected 10 clients, got %d", dash.TotalClients)
+	}
+	if dash.TotalFiles != 500 {
+		t.Errorf("expected 500 files, got %d", dash.TotalFiles)
+	}
+	if (*logs)[0].Path != "/msp/dashboard" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestMSPDashboardListClients(t *testing.T) {
+	srv, _ := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /msp/clients": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, mspClientListResponse{
+				Data:  []MSPClientMetrics{{OrgID: "org-1", OrgName: "Acme"}, {OrgID: "org-2", OrgName: "Corp"}},
+				Total: 2,
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	clients, total, err := c.MSPDashboard.ListClients(context.Background(), nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(clients) != 2 {
+		t.Fatalf("expected 2 clients, got %d", len(clients))
+	}
+	if total != 2 {
+		t.Errorf("expected total 2, got %d", total)
+	}
+}
+
+func TestMSPDashboardGetClientUsage(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /msp/clients/org-1/usage": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, DataResponse[MSPClientUsage]{
+				Data: MSPClientUsage{OrgID: "org-1", OrgName: "Acme", StorageUsed: 1024000},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	usage, err := c.MSPDashboard.GetClientUsage(context.Background(), "org-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if usage.OrgID != "org-1" {
+		t.Errorf("expected org ID 'org-1', got %q", usage.OrgID)
+	}
+	if (*logs)[0].Path != "/msp/clients/org-1/usage" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Imports service
+// ---------------------------------------------------------------------------
+
+func TestImportsCreateConnection(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /import/connections": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 201, DataResponse[ImportConnection]{
+				Data: ImportConnection{ID: "conn-1", Provider: "google_drive", DisplayName: "My Drive", Status: "connected"},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	conn, err := c.Imports.CreateConnection(context.Background(), CreateImportConnectionRequest{
+		Provider:    "google_drive",
+		DisplayName: "My Drive",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if conn.ID != "conn-1" {
+		t.Errorf("expected ID 'conn-1', got %q", conn.ID)
+	}
+	if (*logs)[0].Path != "/import/connections" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestImportsListConnections(t *testing.T) {
+	srv, _ := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /import/connections": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, ListResponse[ImportConnection]{
+				Data: []ImportConnection{{ID: "conn-1"}, {ID: "conn-2"}},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	conns, err := c.Imports.ListConnections(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(conns) != 2 {
+		t.Fatalf("expected 2 connections, got %d", len(conns))
+	}
+}
+
+func TestImportsDeleteConnection(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"DELETE /import/connections/conn-1": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(204)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.Imports.DeleteConnection(context.Background(), "conn-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Path != "/import/connections/conn-1" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestImportsStartImport(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /import/connections/conn-1/start": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 201, DataResponse[ImportJob]{
+				Data: ImportJob{ID: "job-1", ConnectionID: "conn-1", Status: "running", SourcePath: "/Documents"},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	job, err := c.Imports.StartImport(context.Background(), "conn-1", StartImportRequest{
+		SourcePath:   "/Documents",
+		DestFolderID: "fold-1",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if job.ID != "job-1" {
+		t.Errorf("expected ID 'job-1', got %q", job.ID)
+	}
+	if (*logs)[0].Path != "/import/connections/conn-1/start" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestImportsListJobs(t *testing.T) {
+	srv, _ := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /import/jobs": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, ListResponse[ImportJob]{
+				Data: []ImportJob{{ID: "job-1"}, {ID: "job-2"}},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	jobs, err := c.Imports.ListJobs(context.Background())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(jobs) != 2 {
+		t.Fatalf("expected 2 jobs, got %d", len(jobs))
+	}
+}
+
+func TestImportsGetJob(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"GET /import/jobs/job-1": func(w http.ResponseWriter, r *http.Request) {
+			writeJSON(w, 200, DataResponse[ImportJob]{
+				Data: ImportJob{ID: "job-1", Status: "completed", TotalFiles: 100, FilesImported: 98, FilesFailed: 2},
+			})
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	job, err := c.Imports.GetJob(context.Background(), "job-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if job.FilesImported != 98 {
+		t.Errorf("expected 98 files imported, got %d", job.FilesImported)
+	}
+	if (*logs)[0].Path != "/import/jobs/job-1" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
+	}
+}
+
+func TestImportsCancelJob(t *testing.T) {
+	srv, logs := newMockServer(t, map[string]http.HandlerFunc{
+		"POST /import/jobs/job-1/cancel": func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+		},
+	})
+	defer srv.Close()
+
+	c := NewClient("test-key", WithBaseURL(srv.URL))
+	err := c.Imports.CancelJob(context.Background(), "job-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if (*logs)[0].Path != "/import/jobs/job-1/cancel" {
+		t.Errorf("unexpected path: %s", (*logs)[0].Path)
 	}
 }

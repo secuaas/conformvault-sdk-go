@@ -1,11 +1,35 @@
 # Historique des Versions - ConformVault Go SDK
 
 ## Version Actuelle
-**0.5.4** - 2026-03-04
+**0.6.0** - 2026-03-15
 
 ---
 
 ## Versions
+
+### 0.6.0 - 2026-03-15
+**Commit:** `pending`
+**Type:** Minor - Add 8 v3 feature services: SecretVault, ExpectedFiles, SpaceMessaging, Retention Exceptions/Approvals, Temporary Permissions, Signature Delegation, MSP Dashboard, Import Wizard
+
+### Ajouté
+- **`secret_vault.go`**: `SecretVaultService` — Create, List, Get, Delete (4 methods)
+- **`expected_files.go`**: `ExpectedFilesService` — Create, List, Update, Delete, GetProgress (5 methods)
+- **`space_messaging.go`**: `SpaceMessagingService` — SendMessage, ListMessages, GetReplies, MarkRead, DeleteMessage (5 methods)
+- **`msp_dashboard.go`**: `MSPDashboardService` — GetDashboard, ListClients, GetClientUsage (3 methods)
+- **`imports.go`**: `ImportsService` — CreateConnection, ListConnections, DeleteConnection, StartImport, ListJobs, GetJob, CancelJob (7 methods)
+- **`retention.go`**: Added CreateException, ListExceptions, DeleteException, ListPendingApprovals, DecideApproval (5 methods)
+- **`permissions.go`**: Added SetWithExpiry for temporary access (1 method)
+- **`signatures.go`**: Added Delegate for signature delegation (1 method)
+- 20+ new types in `types.go` (Secret, ExpectedFile, SpaceMessage, RetentionException, RetentionApproval, DelegateSignRequest, MSPDashboardSummary, MSPClientMetrics, ImportConnection, ImportJob, etc.)
+- `ExpiresAt` field added to `FolderPermission` type
+- 34 new unit tests (51 → 85 total)
+- Total services: 29 → 34
+
+### Tests effectués
+- ✅ `go build ./...` — success
+- ✅ `go test ./...` — 85 tests passing
+
+---
 
 ### 0.5.4 - 2026-03-04
 **Commit:** `pending`

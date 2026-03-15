@@ -102,6 +102,15 @@ func (s *SignaturesService) PreviewPDF(ctx context.Context, fileID string) (io.R
 	return s.client.doRaw(r)
 }
 
+// Delegate delegates a signer's signature to another person.
+func (s *SignaturesService) Delegate(ctx context.Context, envelopeID, signerID string, request DelegateSignRequest) error {
+	req, err := s.client.newRequest(ctx, "POST", "/signatures/"+envelopeID+"/signers/"+signerID+"/delegate", request)
+	if err != nil {
+		return err
+	}
+	return s.client.do(req, nil)
+}
+
 // GetEmbeddedSignLink retrieves an embedded signing link for a signer.
 func (s *SignaturesService) GetEmbeddedSignLink(ctx context.Context, envelopeID, signerEmail string, redirectURL ...string) (*EmbeddedSignLinkResponse, error) {
 	path := "/signatures/" + envelopeID + "/embed-sign?signer_email=" + url.QueryEscape(signerEmail)

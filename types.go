@@ -444,16 +444,24 @@ type LegalHoldFile struct {
 
 // FolderPermission represents a permission granted on a folder.
 type FolderPermission struct {
-	FolderID   string    `json:"folder_id"`
-	UserID     string    `json:"user_id"`
-	Permission string    `json:"permission"`
-	GrantedAt  time.Time `json:"granted_at"`
+	FolderID   string     `json:"folder_id"`
+	UserID     string     `json:"user_id"`
+	Permission string     `json:"permission"`
+	GrantedAt  time.Time  `json:"granted_at"`
+	ExpiresAt  *time.Time `json:"expires_at,omitempty"`
 }
 
 // SetFolderPermissionRequest is the input for setting a folder permission.
 type SetFolderPermissionRequest struct {
 	UserID     string `json:"user_id"`
 	Permission string `json:"permission"`
+}
+
+// SetPermissionWithExpiryRequest is the input for setting a temporary folder permission.
+type SetPermissionWithExpiryRequest struct {
+	UserID     string    `json:"user_id"`
+	Permission string    `json:"permission"`
+	ExpiresAt  time.Time `json:"expires_at"`
 }
 
 // --- Comment types ---
@@ -599,4 +607,244 @@ type EncryptionSalt struct {
 // SetEncryptionSaltRequest is the input for updating the encryption salt.
 type SetEncryptionSaltRequest struct {
 	Salt string `json:"salt"`
+}
+
+// --- Secret Vault types ---
+
+// Secret represents an ephemeral secret.
+type Secret struct {
+	ID               string     `json:"id"`
+	Token            string     `json:"token"`
+	ContentSize      int        `json:"content_size"`
+	MaxViews         int        `json:"max_views"`
+	ViewCount        int        `json:"view_count"`
+	TTLSeconds       int        `json:"ttl_seconds"`
+	ExpiresAt        *time.Time `json:"expires_at,omitempty"`
+	Status           string     `json:"status"`
+	RequireEmailCode bool       `json:"require_email_code"`
+	RecipientEmail   string     `json:"recipient_email,omitempty"`
+	CreatedAt        time.Time  `json:"created_at"`
+}
+
+// CreateSecretRequest is the input for creating a secret.
+type CreateSecretRequest struct {
+	Content          string `json:"content"`
+	MaxViews         int    `json:"max_views,omitempty"`
+	TTLSeconds       int    `json:"ttl_seconds,omitempty"`
+	RequireEmailCode bool   `json:"require_email_code,omitempty"`
+	RecipientEmail   string `json:"recipient_email,omitempty"`
+}
+
+// SecretListOptions are query parameters for listing secrets.
+type SecretListOptions struct {
+	Limit  int `json:"limit,omitempty"`
+	Offset int `json:"offset,omitempty"`
+}
+
+// --- Expected File types ---
+
+// ExpectedFile represents an expected file on a share link.
+type ExpectedFile struct {
+	ID                string     `json:"id"`
+	ShareLinkID       string     `json:"share_link_id"`
+	Label             string     `json:"label"`
+	Description       string     `json:"description,omitempty"`
+	IsRequired        bool       `json:"is_required"`
+	SortOrder         int        `json:"sort_order"`
+	Status            string     `json:"status"`
+	FileID            *string    `json:"file_id,omitempty"`
+	FulfilledAt       *time.Time `json:"fulfilled_at,omitempty"`
+	DueDate           *string    `json:"due_date,omitempty"`
+	Category          string     `json:"category,omitempty"`
+	AcceptedMimeTypes []string   `json:"accepted_mime_types,omitempty"`
+	MaxFileSize       int64      `json:"max_file_size,omitempty"`
+}
+
+// CreateExpectedFileRequest is the input for creating an expected file.
+type CreateExpectedFileRequest struct {
+	Label             string   `json:"label"`
+	Description       string   `json:"description,omitempty"`
+	IsRequired        bool     `json:"is_required,omitempty"`
+	SortOrder         int      `json:"sort_order,omitempty"`
+	DueDate           *string  `json:"due_date,omitempty"`
+	Category          string   `json:"category,omitempty"`
+	AcceptedMimeTypes []string `json:"accepted_mime_types,omitempty"`
+	MaxFileSize       int64    `json:"max_file_size,omitempty"`
+}
+
+// UpdateExpectedFileRequest is the input for updating an expected file.
+type UpdateExpectedFileRequest struct {
+	Label             *string  `json:"label,omitempty"`
+	Description       *string  `json:"description,omitempty"`
+	IsRequired        *bool    `json:"is_required,omitempty"`
+	SortOrder         *int     `json:"sort_order,omitempty"`
+	DueDate           *string  `json:"due_date,omitempty"`
+	Category          *string  `json:"category,omitempty"`
+	AcceptedMimeTypes []string `json:"accepted_mime_types,omitempty"`
+	MaxFileSize       *int64   `json:"max_file_size,omitempty"`
+}
+
+// ExpectedFileProgress contains fulfillment progress for expected files.
+type ExpectedFileProgress struct {
+	Total             int `json:"total"`
+	Fulfilled         int `json:"fulfilled"`
+	Required          int `json:"required"`
+	RequiredFulfilled int `json:"required_fulfilled"`
+}
+
+// --- Space Messaging types ---
+
+// SpaceMessage represents a message in a space.
+type SpaceMessage struct {
+	ID           string    `json:"id"`
+	SpaceID      string    `json:"space_id"`
+	UserID       string    `json:"user_id"`
+	ParentID     *string   `json:"parent_id,omitempty"`
+	Content      string    `json:"content"`
+	RepliesCount int       `json:"replies_count"`
+	IsDeleted    bool      `json:"is_deleted"`
+	IsRead       bool      `json:"is_read"`
+	SenderName   string    `json:"sender_name"`
+	SenderEmail  string    `json:"sender_email"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// CreateSpaceMessageRequest is the input for sending a message in a space.
+type CreateSpaceMessageRequest struct {
+	Content  string  `json:"content"`
+	ParentID *string `json:"parent_id,omitempty"`
+}
+
+// MessageListOptions are query parameters for listing space messages.
+type MessageListOptions struct {
+	Limit  int `json:"limit,omitempty"`
+	Offset int `json:"offset,omitempty"`
+}
+
+// --- Retention Exception & Approval types ---
+
+// RetentionException represents an exception to a retention policy.
+type RetentionException struct {
+	ID           string    `json:"id"`
+	PolicyID     string    `json:"policy_id"`
+	ResourceType string    `json:"resource_type"`
+	ResourceID   string    `json:"resource_id"`
+	Reason       string    `json:"reason"`
+	CreatedBy    string    `json:"created_by"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+// CreateRetentionExceptionRequest is the input for creating a retention exception.
+type CreateRetentionExceptionRequest struct {
+	ResourceType string `json:"resource_type"`
+	ResourceID   string `json:"resource_id"`
+	Reason       string `json:"reason"`
+}
+
+// RetentionApproval represents a pending or decided retention approval.
+type RetentionApproval struct {
+	ID              string     `json:"id"`
+	PolicyID        string     `json:"policy_id"`
+	FileID          string     `json:"file_id"`
+	Status          string     `json:"status"`
+	RequestedAt     time.Time  `json:"requested_at"`
+	DecidedBy       *string    `json:"decided_by,omitempty"`
+	DecidedAt       *time.Time `json:"decided_at,omitempty"`
+	RejectionReason string     `json:"rejection_reason,omitempty"`
+}
+
+// DecideApprovalRequest is the input for approving or rejecting a retention approval.
+type DecideApprovalRequest struct {
+	Decision        string `json:"decision"`
+	RejectionReason string `json:"rejection_reason,omitempty"`
+}
+
+// --- Signature Delegation types ---
+
+// DelegateSignRequest is the input for delegating a signer's signature.
+type DelegateSignRequest struct {
+	DelegatedToEmail string `json:"delegated_to_email"`
+	DelegatedToName  string `json:"delegated_to_name"`
+	Reason           string `json:"reason,omitempty"`
+}
+
+// --- MSP Dashboard types ---
+
+// MSPDashboardSummary contains aggregate MSP dashboard metrics.
+type MSPDashboardSummary struct {
+	TotalClients      int   `json:"total_clients"`
+	TotalUsers        int   `json:"total_users"`
+	TotalStorageBytes int64 `json:"total_storage_bytes"`
+	TotalFiles        int   `json:"total_files"`
+	TotalSignatures   int   `json:"total_signatures"`
+}
+
+// MSPClientMetrics contains metrics for a single MSP client.
+type MSPClientMetrics struct {
+	OrgID           string `json:"org_id"`
+	OrgName         string `json:"org_name"`
+	Plan            string `json:"plan"`
+	UsersCount      int    `json:"users_count"`
+	StorageUsed     int64  `json:"storage_used"`
+	StorageLimit    int64  `json:"storage_limit"`
+	FilesCount      int    `json:"files_count"`
+	SignaturesCount int    `json:"signatures_count"`
+}
+
+// MSPClientUsage contains detailed usage metrics for an MSP client.
+type MSPClientUsage struct {
+	OrgID           string `json:"org_id"`
+	OrgName         string `json:"org_name"`
+	Plan            string `json:"plan"`
+	UsersCount      int    `json:"users_count"`
+	StorageUsed     int64  `json:"storage_used"`
+	StorageLimit    int64  `json:"storage_limit"`
+	FilesCount      int    `json:"files_count"`
+	SignaturesCount int    `json:"signatures_count"`
+}
+
+// MSPClientListOptions are query parameters for listing MSP clients.
+type MSPClientListOptions struct {
+	Search string `json:"search,omitempty"`
+	Limit  int    `json:"limit,omitempty"`
+	Offset int    `json:"offset,omitempty"`
+}
+
+// --- Import Wizard types ---
+
+// ImportConnection represents a cloud storage import connection.
+type ImportConnection struct {
+	ID           string    `json:"id"`
+	Provider     string    `json:"provider"`
+	DisplayName  string    `json:"display_name"`
+	Status       string    `json:"status"`
+	AccountEmail string    `json:"account_email"`
+	CreatedAt    time.Time `json:"created_at"`
+}
+
+// ImportJob represents an import job.
+type ImportJob struct {
+	ID            string    `json:"id"`
+	ConnectionID  string    `json:"connection_id"`
+	Status        string    `json:"status"`
+	SourcePath    string    `json:"source_path"`
+	TotalFiles    int       `json:"total_files"`
+	FilesImported int       `json:"files_imported"`
+	FilesFailed   int       `json:"files_failed"`
+	BytesImported int64     `json:"bytes_imported"`
+	CreatedAt     time.Time `json:"created_at"`
+}
+
+// CreateImportConnectionRequest is the input for creating an import connection.
+type CreateImportConnectionRequest struct {
+	Provider    string         `json:"provider"`
+	DisplayName string        `json:"display_name"`
+	Credentials map[string]any `json:"credentials"`
+}
+
+// StartImportRequest is the input for starting an import job.
+type StartImportRequest struct {
+	SourcePath   string `json:"source_path"`
+	DestFolderID string `json:"dest_folder_id,omitempty"`
 }
