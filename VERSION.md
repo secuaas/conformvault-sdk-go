@@ -1,11 +1,28 @@
 # Historique des Versions - ConformVault Go SDK
 
 ## Version Actuelle
-**0.6.0** - 2026-03-15
+**0.6.1** - 2026-03-15
 
 ---
 
 ## Versions
+
+### 0.6.1 - 2026-03-15
+**Commit:** `pending`
+**Type:** Patch - Add TextSearchService with OCR metadata fields and RequeueSkippedOCR
+
+### Ajouté
+- **`text_search.go`**: `TextSearchService` — Search, GetIndexStats, GetFileIndexStatus, ReindexFile, RequeueSkippedOCR (5 methods)
+- `DocumentTextIndex` type with OCR metadata fields: `OCREngine`, `OCRConfidence`, `ExtractionDurationMs`
+- `TextSearchResult`, `TextSearchOptions`, `TextSearchResponse`, `RequeueOCRResponse` types
+- Service registered as `client.TextSearch`
+- Total services: 34 → 35
+
+### Tests effectués
+- ✅ `go build ./...` — success
+- ✅ `go vet ./...` — success
+
+---
 
 ### 0.6.0 - 2026-03-15
 **Commit:** `pending`

@@ -848,3 +848,61 @@ type StartImportRequest struct {
 	SourcePath   string `json:"source_path"`
 	DestFolderID string `json:"dest_folder_id,omitempty"`
 }
+
+// --- Text Search / Document Text Index types ---
+
+// DocumentTextIndex is the full-text index entry for a file.
+type DocumentTextIndex struct {
+	ID                   string     `json:"id"`
+	FileID               string     `json:"file_id"`
+	OrganizationID       string     `json:"organization_id"`
+	SpaceID              *string    `json:"space_id,omitempty"`
+	Content              string     `json:"content,omitempty"`
+	Language             string     `json:"language"`
+	SourceType           string     `json:"source_type"`
+	Status               string     `json:"status"`
+	ErrorMessage         *string    `json:"error_message,omitempty"`
+	PageCount            *int       `json:"page_count,omitempty"`
+	WordCount            *int       `json:"word_count,omitempty"`
+	OCREngine            *string    `json:"ocr_engine,omitempty"`
+	OCRConfidence        *float32   `json:"ocr_confidence,omitempty"`
+	ExtractionDurationMs *int       `json:"extraction_duration_ms,omitempty"`
+	ExtractedAt          *time.Time `json:"extracted_at,omitempty"`
+	CreatedAt            time.Time  `json:"created_at"`
+	UpdatedAt            time.Time  `json:"updated_at"`
+}
+
+// TextSearchResult is a single full-text search hit with relevance ranking.
+type TextSearchResult struct {
+	FileID     string  `json:"file_id"`
+	SpaceID    *string `json:"space_id,omitempty"`
+	Filename   string  `json:"filename"`
+	MimeType   string  `json:"mime_type,omitempty"`
+	Snippet    string  `json:"snippet"`
+	Rank       float64 `json:"rank"`
+	SourceType string  `json:"source_type"`
+	WordCount  *int    `json:"word_count,omitempty"`
+	SpaceName  string  `json:"space_name,omitempty"`
+}
+
+// TextSearchOptions are query parameters for full-text search.
+type TextSearchOptions struct {
+	Query    string  `json:"q"`
+	SpaceID  *string `json:"space_id,omitempty"`
+	Language string  `json:"lang,omitempty"`
+	Limit    int     `json:"limit,omitempty"`
+	Offset   int     `json:"offset,omitempty"`
+}
+
+// TextSearchResponse wraps the full-text search response.
+type TextSearchResponse struct {
+	Data  []TextSearchResult `json:"data"`
+	Total int                `json:"total"`
+	Query string             `json:"query"`
+}
+
+// RequeueOCRResponse is the response from requeuing skipped OCR entries.
+type RequeueOCRResponse struct {
+	Message string `json:"message"`
+	Count   int    `json:"count"`
+}

@@ -21,7 +21,7 @@ const (
 	// DefaultBaseURL is the default API base URL.
 	DefaultBaseURL = "https://api.conformvault.com/dev/v1"
 	// Version is the SDK version.
-	Version = "0.6.0"
+	Version = "0.6.1"
 	// userAgent is the User-Agent header value.
 	userAgent = "conformvault-go/" + Version
 )
@@ -66,6 +66,7 @@ type Client struct {
 	SpaceMessaging        *SpaceMessagingService
 	MSPDashboard          *MSPDashboardService
 	Imports               *ImportsService
+	TextSearch            *TextSearchService
 }
 
 // Option configures the client.
@@ -133,6 +134,7 @@ func NewClient(apiKey string, opts ...Option) *Client {
 	c.SpaceMessaging = &SpaceMessagingService{client: c}
 	c.MSPDashboard = &MSPDashboardService{client: c}
 	c.Imports = &ImportsService{client: c}
+	c.TextSearch = &TextSearchService{client: c}
 
 	return c
 }
